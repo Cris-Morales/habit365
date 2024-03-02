@@ -85,6 +85,7 @@ export default function TabOneScreen() {
           }
           // triggers a database update, do not update state until we receive an okay from the transaction function, ie. The Tanstack Query function. For now it's just a simple state function update.
         }}
+          bounceEffectIn={1.3}
         />
         <FlatList
           horizontal={true}
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
   habitStats: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: 3
+    marginRight: 5
   },
   statsContainer: {
     flexDirection: 'row',
