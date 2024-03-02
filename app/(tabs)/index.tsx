@@ -15,7 +15,8 @@ const dummyData = {
   color: '#e6e600',
   current_streak: 6,
   total_days: 50,
-  date_diff: 60
+  date_diff: 60,
+  id: 1
 }
 
 export default function TabOneScreen() {
@@ -25,20 +26,25 @@ export default function TabOneScreen() {
 
 
   const openHabitModal = () => {
-    router.navigate('/modal')
+    router.navigate(
+      {
+        pathname: 'modal',
+        params: {
+          id: dummyData.id,
+          title: dummyData.title
+        }
+      }
+    )
   }
 
   return (
     <View style={styles.container}>
       <View style={styles.habitView}>
-
-        {/* <Link href="/modal" asChild> */}
         <Pressable onLongPress={openHabitModal}>
           <Text style={styles.habitText}>
             {dummyData.title}
           </Text>
         </Pressable>
-        {/* </Link> */}
         <BouncyCheckbox fillColor={dummyData.color} size={40} onPress={(isChecked: boolean) => {
           if (isChecked) {
             setStreak(streak + 1)
