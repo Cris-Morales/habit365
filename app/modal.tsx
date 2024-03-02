@@ -16,6 +16,9 @@ export default function ModalScreen() {
   // either pass all habit data, and only create fetch for updates
   // or
   // fetch data from passed id/title, and create fetch for updates
+  // ... don't think I can pass props to modal, maybe if I use useContext
+  // but it's looking like I need to fetch as it loads, and create local state.
+
 
 
   return (

@@ -1,11 +1,7 @@
-import { StyleSheet, Pressable } from 'react-native';
+import { StyleSheet, Pressable, FlatList } from 'react-native';
 import { useState } from 'react';
 import { Text, View } from '@/components/Themed';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import { useColorScheme } from '@/components/useColorScheme';
-
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router'
 
 const dummyData = {
@@ -19,11 +15,30 @@ const dummyData = {
   id: 1
 }
 
+interface listData {
+  title: string;
+  data: string;
+}
+
 export default function TabOneScreen() {
   const [streak, setStreak] = useState<number>(dummyData.current_streak)
   const [total, setTotal] = useState<number>(dummyData.total_days)
   const [perHit, setPerHit] = useState<number>(Math.round(total / dummyData.date_diff * 1000) / 10)
 
+  const dataArray: listData[] = [
+    {
+      title: 'Hit Rate',
+      data: `${perHit}%`
+    },
+    {
+      title: 'Streak',
+      data: `${streak}`
+    },
+    {
+      title: 'Total',
+      data: `${total} / ${dummyData.date_diff}`
+    }
+  ]
 
   const openHabitModal = () => {
     router.navigate(
@@ -34,6 +49,19 @@ export default function TabOneScreen() {
           title: dummyData.title
         }
       }
+    )
+  }
+
+  const HabitData = ({ item }: { item: listData }) => {
+    return (
+      <View style={styles.habitStats}>
+        <Text>
+          {item.title}
+        </Text>
+        <Text>
+          {item.data}
+        </Text>
+      </View>
     )
   }
 
@@ -58,30 +86,14 @@ export default function TabOneScreen() {
           // triggers a database update, do not update state until we receive an okay from the transaction function, ie. The Tanstack Query function. For now it's just a simple state function update.
         }}
         />
-        <View style={styles.habitStats}>
-          <Text>
-            Hit Rate
-          </Text>
-          <Text>
-            {perHit}%
-          </Text>
-        </View>
-        <View style={styles.habitStats}>
-          <Text>
-            Streak
-          </Text>
-          <Text>
-            {streak}
-          </Text>
-        </View>
-        <View style={styles.habitStats}>
-          <Text>
-            Total
-          </Text>
-          <Text>
-            {total} / {dummyData.date_diff}
-          </Text>
-        </View>
+        <FlatList
+          horizontal={true}
+          scrollEnabled={false}
+          data={dataArray}
+          keyExtractor={item => item.title}
+          renderItem={HabitData}
+          ListFooterComponentStyle={styles.statsContainer}
+        />
       </View>
     </View >
   );
@@ -123,5 +135,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 3
+  },
+  statsContainer: {
+    flexDirection: 'row',
   }
 });
