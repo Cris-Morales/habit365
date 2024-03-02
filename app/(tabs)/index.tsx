@@ -1,5 +1,5 @@
-import { StyleSheet, Pressable, FlatList } from 'react-native';
-import { useState } from 'react';
+import { StyleSheet, Pressable, FlatList, Button, Animated } from 'react-native';
+import { useState, useRef } from 'react';
 import { Text, View } from '@/components/Themed';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { router } from 'expo-router'
@@ -24,6 +24,7 @@ export default function TabOneScreen() {
   const [streak, setStreak] = useState<number>(dummyData.current_streak)
   const [total, setTotal] = useState<number>(dummyData.total_days)
   const [perHit, setPerHit] = useState<number>(Math.round(total / dummyData.date_diff * 1000) / 10)
+  const [color, setColor] = useState<boolean>(false);
 
   const dataArray: listData[] = [
     {
@@ -39,6 +40,34 @@ export default function TabOneScreen() {
       data: `${total} / ${dummyData.date_diff}`
     }
   ]
+
+  const scaleAnimation = useRef(new Animated.Value(1)).current;
+  const testAnimation = useRef(new Animated.Value(1)).current;
+
+
+  const testAni = () => {
+    // setColor(color ? false : true)
+    // Animated.timing(testAnimation, {
+    //   toValue: 1,
+    //   duration: 2000,
+    //   useNativeDriver: true
+    // }).start();
+    Animated.spring(testAnimation, {
+      toValue: 1,
+      friction: 3,
+      tension: 40,
+      useNativeDriver: true
+    }).start();
+  }
+
+  const colorDrop = () => {
+    setColor(color ? false : true)
+    Animated.timing(testAnimation, {
+      toValue: 0,
+      duration: 2000,
+      useNativeDriver: true
+    }).start();
+  }
 
   const openHabitModal = () => {
     router.navigate(
@@ -73,6 +102,8 @@ export default function TabOneScreen() {
             {dummyData.title}
           </Text>
         </Pressable>
+        {/* // might replace this with a custom button component, passing in a function prop as a callback function, and using the animations I found. 
+        it's also kinda buggy, yeah I'm totally doing it custom...*/}
         <BouncyCheckbox fillColor={dummyData.color} size={40} onPress={(isChecked: boolean) => {
           if (isChecked) {
             setStreak(streak + 1)
@@ -96,11 +127,39 @@ export default function TabOneScreen() {
           ListFooterComponentStyle={styles.statsContainer}
         />
       </View>
+      {/* <Pressable
+        onPress={() => setColor(color ? false : true)}
+        style={() => [
+          { backgroundColor: color ? dummyData.color : 'null' },
+          styles.checkbox
+        ]}
+      /> */}
+      <Pressable
+        onPress={testAni}
+        style={styles.checkbox}
+      >
+        <Animated.View
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 25,
+            transform: [{ scale: testAnimation }]
+          }} />
+
+      </Pressable>
     </View >
   );
 }
 
 const styles = StyleSheet.create({
+  checkbox: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 20,
+    height: 40,
+    width: 40,
+    backgroundColor: dummyData.color
+  },
   container: {
     flex: 1,
     alignItems: 'center',

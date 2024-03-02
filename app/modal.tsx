@@ -19,7 +19,7 @@ export default function ModalScreen() {
   // ... don't think I can pass props to modal, maybe if I use useContext
   // but it's looking like I need to fetch as it loads, and create local state.
 
-
+  // adding in dummy data to start making the stats and options, working with forms, and constructing the props and mock fetches.
 
   return (
     <View style={styles.container}>
