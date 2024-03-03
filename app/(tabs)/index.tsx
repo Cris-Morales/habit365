@@ -10,9 +10,10 @@ export default function TabOneScreen() {
   const routineLists = (item: any) => {
     return (
       <View>
+        <HabitRow habitData={item.routine_data} />
         <FlatList
           scrollEnabled={true}
-          data={item}
+          data={item.routine_habits}
           keyExtractor={(item) => item.title}
           renderItem={({ item }) => {
             return (<HabitRow habitData={item} />)
@@ -31,8 +32,7 @@ export default function TabOneScreen() {
         renderItem={({ item }) => {
 
           return (
-            // <Text>{item.routine_data.title}</Text>
-            routineLists(item.routine_habits)
+            routineLists(item)
           )
         }}
       />

@@ -65,15 +65,27 @@ export default function HabitButton({ statsUpdate, habitColor }: props) {
     const handlePressedIn = () => {
 
         if (pressed) {
+            // Animated.spring(springAnimation, {
+            //     toValue: 0.9,
+            //     friction: 10,
+            //     tension: 50,
+            //     useNativeDriver: true,
+            // }).start()
             Animated.timing(springAnimation, {
-                toValue: 0.9,
-                duration: timing * 0.50,
+                toValue: 0.85,
+                duration: timing,
                 useNativeDriver: true,
             }).start()
         } else {
+            // Animated.spring(springAnimation, {
+            //     toValue: 0.8,
+            //     friction: 10,
+            //     tension: 50,
+            //     useNativeDriver: true,
+            // }).start()
             Animated.timing(springAnimation, {
-                toValue: 0.8,
-                duration: timing * 0.50,
+                toValue: 0.75,
+                duration: timing,
                 useNativeDriver: true,
             }).start()
         }
