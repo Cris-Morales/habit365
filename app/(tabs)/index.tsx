@@ -1,8 +1,9 @@
-import { StyleSheet, Pressable, FlatList, Button, Animated } from 'react-native';
-import { useState, useRef } from 'react';
+import { StyleSheet, Pressable, FlatList } from 'react-native';
+import { useState } from 'react';
 import { Text, View } from '@/components/Themed';
-import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { router } from 'expo-router'
+import HabitButton from '@/components/HabitButton';
+import HabitRow from '@/components/HabitRow';
 
 const dummyData = {
   start_data: '2024-01-01',
@@ -24,7 +25,6 @@ export default function TabOneScreen() {
   const [streak, setStreak] = useState<number>(dummyData.current_streak)
   const [total, setTotal] = useState<number>(dummyData.total_days)
   const [perHit, setPerHit] = useState<number>(Math.round(total / dummyData.date_diff * 1000) / 10)
-  const [color, setColor] = useState<boolean>(false);
 
   const dataArray: listData[] = [
     {
@@ -41,33 +41,7 @@ export default function TabOneScreen() {
     }
   ]
 
-  const scaleAnimation = useRef(new Animated.Value(1)).current;
-  const testAnimation = useRef(new Animated.Value(1)).current;
 
-
-  const testAni = () => {
-    // setColor(color ? false : true)
-    // Animated.timing(testAnimation, {
-    //   toValue: 1,
-    //   duration: 2000,
-    //   useNativeDriver: true
-    // }).start();
-    Animated.spring(testAnimation, {
-      toValue: 1,
-      friction: 3,
-      tension: 40,
-      useNativeDriver: true
-    }).start();
-  }
-
-  const colorDrop = () => {
-    setColor(color ? false : true)
-    Animated.timing(testAnimation, {
-      toValue: 0,
-      duration: 2000,
-      useNativeDriver: true
-    }).start();
-  }
 
   const openHabitModal = () => {
     router.navigate(
@@ -79,6 +53,19 @@ export default function TabOneScreen() {
         }
       }
     )
+  }
+
+  const statsUpdate = (isChecked: boolean): void => {
+    if (isChecked) {
+      setStreak(streak + 1)
+      setTotal(total + 1)
+      setPerHit(Math.round((total + 1) / dummyData.date_diff * 1000) / 10)
+    } else {
+      setStreak(streak - 1)
+      setTotal(total - 1)
+      setPerHit(Math.round((total - 1) / dummyData.date_diff * 1000) / 10)
+    }
+    // triggers a database update, do not update state until we receive an okay from the transaction function, ie. The Tanstack Query function. For now it's just a simple state function update.
   }
 
   const HabitData = ({ item }: { item: listData }) => {
@@ -96,107 +83,53 @@ export default function TabOneScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.habitView}>
-        <Pressable onLongPress={openHabitModal}>
-          <Text style={styles.habitText}>
-            {dummyData.title}
-          </Text>
-        </Pressable>
-        {/* // might replace this with a custom button component, passing in a function prop as a callback function, and using the animations I found. 
-        it's also kinda buggy, yeah I'm totally doing it custom...*/}
-        <BouncyCheckbox fillColor={dummyData.color} size={40} onPress={(isChecked: boolean) => {
-          if (isChecked) {
-            setStreak(streak + 1)
-            setTotal(total + 1)
-            setPerHit(Math.round((total + 1) / dummyData.date_diff * 1000) / 10)
-          } else {
-            setStreak(streak - 1)
-            setTotal(total - 1)
-            setPerHit(Math.round((total - 1) / dummyData.date_diff * 1000) / 10)
-          }
-          // triggers a database update, do not update state until we receive an okay from the transaction function, ie. The Tanstack Query function. For now it's just a simple state function update.
-        }}
-          bounceEffectIn={1.3}
-        />
-        <FlatList
-          horizontal={true}
-          scrollEnabled={false}
-          data={dataArray}
-          keyExtractor={item => item.title}
-          renderItem={HabitData}
-          ListFooterComponentStyle={styles.statsContainer}
-        />
-      </View>
-      {/* <Pressable
-        onPress={() => setColor(color ? false : true)}
-        style={() => [
-          { backgroundColor: color ? dummyData.color : 'null' },
-          styles.checkbox
-        ]}
-      /> */}
-      <Pressable
-        onPress={testAni}
-        style={styles.checkbox}
-      >
-        <Animated.View
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 25,
-            transform: [{ scale: testAnimation }]
-          }} />
-
-      </Pressable>
+      <HabitRow habitData={dummyData} />
     </View >
   );
 }
 
 const styles = StyleSheet.create({
-  checkbox: {
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 20,
-    height: 40,
-    width: 40,
-    backgroundColor: dummyData.color
-  },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-  habitButton: {
-    backgroundColor: 'green',
-  },
   habitView: {
+    height: 75,
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 8,
-    padding: 6
+    paddingHorizontal: 5,
+    marginHorizontal: 2,
+    marginTop: 5,
+  },
+  modalButton: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: 'gray',
   },
   habitText: {
+    flexDirection: 'row',
     marginRight: 10,
     justifyContent: 'center',
-    textAlign: 'center',
+    textAlign: 'justify',
+    alignItems: 'center',
+    fontSize: 16,
+  },
+  habitButton: {
+    backgroundColor: 'green',
+  },
+  statsContainer: {
+    flexDirection: 'row',
   },
   habitStats: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 5
+    width: 65,
+    borderWidth: 1,
+    borderColor: 'gray',
   },
-  statsContainer: {
-    flexDirection: 'row',
-  }
 });
