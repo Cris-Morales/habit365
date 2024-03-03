@@ -1,6 +1,8 @@
 import { StyleSheet, Pressable, FlatList, Button, Animated } from 'react-native';
 import { useState, useRef } from 'react';
 import { Text, View } from '@/components/Themed';
+import Svg, { Circle, Rect } from 'react-native-svg';
+import HabitRow from '@/components/HabitRow';
 
 const dummyData = {
   start_data: '2024-01-01',
@@ -17,14 +19,16 @@ export default function TabTwoScreen() {
 
   const [pressed, setPressed] = useState<boolean>(false)
   const [progress, setProgress] = useState<number>(0);
+  const [bubbleProgress, setBubbleProgress] = useState<number>(-49)
   const springAnimation = useRef(new Animated.Value(1)).current;
   const colorAnimation = useRef(new Animated.Value(0)).current;
   const fillAnimation = useRef(new Animated.Value(0)).current;
   const backgroundColorInterpolate = colorAnimation.interpolate({
     inputRange: [0, 1],
     outputRange: ['transparent', dummyData.color]
-  })
-  const timing: number = 150
+  });
+  const timing: number = 150;
+  const progression: number = 4;
 
   const handlePressedOut = () => {
     if (!pressed) {
@@ -68,7 +72,6 @@ export default function TabTwoScreen() {
     };
   };
   const handlePressedIn = () => {
-
     if (pressed) {
       Animated.timing(springAnimation, {
         toValue: 0.85,
@@ -86,14 +89,16 @@ export default function TabTwoScreen() {
 
   const handleFillAnimation = (action: string) => {
     if (action === 'touch') {
-      setProgress(progress - 5)
+      setProgress(progress - progression)
+      setBubbleProgress(bubbleProgress + 10)
       Animated.timing(fillAnimation, {
-        toValue: (progress - 5),
-        duration: 100,
+        toValue: (progress - progression),
+        duration: 0,
         useNativeDriver: true,
       }).start()
     } else if (action === 'hold') {
       setProgress(0)
+      setBubbleProgress(-50)
       Animated.timing(fillAnimation, {
         toValue: 0,
         duration: 100,
@@ -104,63 +109,85 @@ export default function TabTwoScreen() {
 
 
   return (
-    <View style={styles.container}>
-      <Pressable
-        onPressIn={handlePressedIn}
-        onPressOut={handlePressedOut}
-      >
-        <Animated.View
-          style={[
-            styles.checkbox,
-            {
-              backgroundColor: backgroundColorInterpolate,
-              borderColor: dummyData.color,
-              transform: [{
-                scale: springAnimation,
-              }]
-            },
-          ]} />
-      </Pressable>
-      <Animated.View
-        style={[
-          styles.progressBar,
-          {
-            transform: [{
-              translateY: fillAnimation,
-            }]
-          },
-        ]} />
-      <Pressable onPress={() => handleFillAnimation('touch')} onLongPress={() => handleFillAnimation('hold')}>
-        <Text style={{ height: 50, width: 50, backgroundColor: 'gray', textAlign: 'center', textAlignVertical: 'center' }}> {Math.round((progress / (-40)) * 100)}</Text>
-      </Pressable>
-    </View >
+    <View style={{ flex: 1, justifyContent: 'center' }}>
+      <View style={styles.container}>
+        <View style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'row',
+        }}>
+          <Pressable
+            onPressIn={handlePressedIn}
+            onPressOut={handlePressedOut}>
+            <Animated.View
+              style={[
+                styles.checkbox,
+                {
+                  backgroundColor: backgroundColorInterpolate,
+                  borderColor: dummyData.color,
+                  transform: [{
+                    scale: springAnimation,
+                  }]
+                },
+              ]}>
+              <Animated.View
+                style={[
+                  {
+                    // borderWidth: 1,
+                    // borderColor: 'gray',
+                    zIndex: -1,
+                    marginLeft: -1,
+                    marginTop: 39,
+                    position: 'relative',
+                    transform: [{
+                      translateY: fillAnimation,
+                    }]
+                  },
+                ]} >
+                <Svg height="40" width="40" viewBox="0 0 100 100" style={{ zIndex: -1 }}>
+                  <Circle cx='50' cy={bubbleProgress} r='50' stroke='gray' strokeWidth="1" fill='cyan' style={{ position: 'absolute' }} />
+                </Svg>
+              </Animated.View>
+            </Animated.View>
+          </Pressable>
+
+          <Pressable onPress={() => handleFillAnimation('touch')} onLongPress={() => handleFillAnimation('hold')}>
+            <Text style={{ height: 50, width: 50, backgroundColor: 'gray', textAlign: 'center', textAlignVertical: 'center' }}> {Math.round((progress / (-40)) * 100)}</Text>
+          </Pressable>
+        </View>
+        <HabitRow habitData={dummyData} />
+      </View >
+    </View>
+
   );
 }
+
+// if this doesn't work out, what if I fill the bubble 
+// as progress goes, once it fills the entire way you can click it.
 
 
 const styles = StyleSheet.create({
   progressBar: {
-    height: 40,
     width: 40,
     backgroundColor: 'red',
-    borderWidth: 1,
-    borderColor: 'gray',
-    position: 'relative',
+    position: 'absolute',
     zIndex: -1,
   },
   checkbox: {
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 20,
+    marginHorizontal: 5,
     height: 40,
     width: 40,
     backgroundColor: dummyData.color,
 
   },
   container: {
-    flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
+    borderWidth: 1,
+    borderColor: 'gray'
   },
   title: {
     fontSize: 20,
