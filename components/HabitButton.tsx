@@ -66,7 +66,7 @@ export default function HabitButton({ statsUpdate, habitColor }: props) {
 
         Animated.timing(springAnimation, {
             toValue: 0.8,
-            duration: timing,
+            duration: timing * 0.50,
             useNativeDriver: true,
         }).start()
     };
@@ -103,12 +103,10 @@ const styles = StyleSheet.create({
         borderWidth: 1,
     },
     container: {
-        // flex: 1,
         width: 67.5,
         height: 67.5,
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: 'gray',
+
     }
 });

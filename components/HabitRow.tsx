@@ -4,23 +4,27 @@ import { Text, View } from '@/components/Themed';
 import { router } from 'expo-router'
 import HabitButton from '@/components/HabitButton';
 
-const dummyData = {
-    start_data: '2024-01-01',
-    title: 'Meditation',
-    created_at: '2024-01-01',
-    color: '#e6e600',
-    current_streak: 6,
-    total_days: 50,
-    date_diff: 60,
-    id: 1
-}
-
 interface listData {
     title: string;
     data: string;
 }
 
-export default function HabitRow({ habitData }) {
+interface props {
+    habitData: habitData;
+}
+interface habitData {
+    start_data: string;
+    title: string;
+    created_at: string;
+    color: string;
+    current_streak: number;
+    total_days: number;
+    date_diff: number;
+    id: number
+}
+
+
+export default function HabitRow({ habitData }: props) {
     const [streak, setStreak] = useState<number>(habitData.current_streak)
     const [total, setTotal] = useState<number>(habitData.total_days)
     const [perHit, setPerHit] = useState<number>(Math.round(total / habitData.date_diff * 1000) / 10)
@@ -73,7 +77,10 @@ export default function HabitRow({ habitData }) {
                 <Text>
                     {item.title}
                 </Text>
-                <Text>
+                <Text style={{
+                    fontWeight: 'bold',
+                    color: habitData.color
+                }}>
                     {item.data}
                 </Text>
             </View>
@@ -88,7 +95,9 @@ export default function HabitRow({ habitData }) {
                 </Text>
             </Pressable>
             <HabitButton statsUpdate={statsUpdate} habitColor={habitData.color} />
-            <View >
+            <View style={{
+                marginHorizontal: 2
+            }}>
                 <FlatList
                     horizontal={true}
                     scrollEnabled={false}
@@ -103,26 +112,22 @@ export default function HabitRow({ habitData }) {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
     habitView: {
         height: 75,
+        paddingVertical: 2,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'gray',
         borderRadius: 8,
-        paddingHorizontal: 5,
+        paddingLeft: 5,
         marginHorizontal: 2,
         marginTop: 5,
     },
     modalButton: {
-        borderWidth: 1,
-        borderColor: 'gray',
+        // borderWidth: 1,
+        // borderColor: 'gray',
         flex: 1,
     },
     habitText: {
@@ -133,9 +138,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         fontSize: 16,
     },
-    habitButton: {
-        backgroundColor: 'green',
-    },
     statsContainer: {
         flexDirection: 'row',
     },
@@ -145,5 +147,7 @@ const styles = StyleSheet.create({
         width: 65,
         borderWidth: 1,
         borderColor: 'gray',
+        borderRadius: 10,
+        marginHorizontal: 2
     },
 });
