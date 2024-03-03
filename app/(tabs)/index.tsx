@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, FlatList } from 'react-native';
 import { useState } from 'react';
-import { View } from '@/components/Themed';
+import { View, Text } from '@/components/Themed';
 import HabitRow from '@/components/HabitRow';
 
 const dummyData = {
@@ -13,11 +13,40 @@ const dummyData = {
   date_diff: 60,
   id: 1
 }
+// routines
 
 export default function TabOneScreen() {
 
+  // const HabitData = ({ item }: { item: listData }) => {
+  //   return (
+  //     <View style={styles.habitStats}>
+  //       <Text>
+  //         {item.title}
+  //       </Text>
+  //       <Text style={{
+  //         fontWeight: 'bold',
+  //         color: habitData.color
+  //       }}>
+  //         {item.data}
+  //       </Text>
+  //     </View>
+  //   )
+  // }
+
   return (
     <View style={styles.container}>
+      <View style={{
+        marginHorizontal: 2
+      }}>
+        {/* <FlatList
+          horizontal={true}
+          scrollEnabled={false}
+          data={dataArray}
+          keyExtractor={item => item.title}
+          renderItem={HabitData}
+          ListFooterComponentStyle={styles.statsContainer}
+        /> */}
+      </View>
       <HabitRow habitData={dummyData} />
     </View >
   );

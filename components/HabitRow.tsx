@@ -90,13 +90,19 @@ export default function HabitRow({ habitData }: props) {
     return (
         <View style={styles.habitView}>
             <Pressable onLongPress={openHabitModal} style={styles.modalButton}>
-                <Text style={styles.habitText}>
-                    {habitData.title}
-                </Text>
+                <View style={{
+                    flex: 0.75,
+                    justifyContent: 'center',
+                }}>
+
+                    <Text style={styles.habitText}>
+                        {habitData.title}
+                    </Text>
+                </View>
             </Pressable>
             <HabitButton statsUpdate={statsUpdate} habitColor={habitData.color} />
             <View style={{
-                marginHorizontal: 2
+                marginHorizontal: 2,
             }}>
                 <FlatList
                     horizontal={true}
@@ -126,8 +132,6 @@ const styles = StyleSheet.create({
         marginTop: 5,
     },
     modalButton: {
-        // borderWidth: 1,
-        // borderColor: 'gray',
         flex: 1,
     },
     habitText: {
@@ -140,14 +144,17 @@ const styles = StyleSheet.create({
     },
     statsContainer: {
         flexDirection: 'row',
+        alignContent: 'center',
     },
     habitStats: {
         alignItems: 'center',
         justifyContent: 'center',
         width: 65,
+        height: 60,
         borderWidth: 1,
         borderColor: 'gray',
         borderRadius: 10,
-        marginHorizontal: 2
+        marginHorizontal: 2,
+        alignSelf: 'center'
     },
 });
