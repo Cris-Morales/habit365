@@ -9,18 +9,6 @@ interface listData {
     data: string;
 }
 
-interface props {
-    habitData: habitData;
-}
-interface habitData {
-    title: string;
-    color: string;
-    current_streak: number;
-    total_days: number;
-    date_diff: number;
-    id: number
-}
-
 
 export default function HabitRow({ habitData }: any) {
     const [streak, setStreak] = useState<number>(habitData.current_streak)

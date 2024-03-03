@@ -1,6 +1,5 @@
-import { StyleSheet, FlatList, SectionList } from 'react-native';
-import { useState } from 'react';
-import { View, Text } from '@/components/Themed';
+import { StyleSheet, FlatList } from 'react-native';
+import { View } from '@/components/Themed';
 import HabitRow from '@/components/HabitRow';
 import dummyData from '@/components/dummyData';
 
@@ -22,7 +21,6 @@ export default function TabOneScreen() {
       </View>
     )
   }
-
   return (
     <View style={styles.container}>
       <FlatList
@@ -30,13 +28,13 @@ export default function TabOneScreen() {
         data={dummyData}
         keyExtractor={(item, index) => item.routine_data.title + index}
         renderItem={({ item }) => {
-
           return (
             routineLists(item)
           )
         }}
       />
     </View >
+
   );
 }
 

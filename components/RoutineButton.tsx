@@ -6,14 +6,12 @@ interface props {
     habitColor: string;
 }
 
-
-
 export default function HabitButton({ statsUpdate, habitColor }: props) {
 
     const [pressed, setPressed] = useState<boolean>(false)
     const springAnimation = useRef(new Animated.Value(1)).current;
-    const colorAnimation = useRef(new Animated.Value(0)).current;
-    const backgroundColorInterpolate = colorAnimation.interpolate({
+    const testColorAnimation = useRef(new Animated.Value(0)).current;
+    const backgroundColorInterpolate = testColorAnimation.interpolate({
         inputRange: [0, 1],
         outputRange: ['transparent', habitColor]
     })
@@ -36,7 +34,7 @@ export default function HabitButton({ statsUpdate, habitColor }: props) {
                         useNativeDriver: true,
                     })
                 ]),
-                Animated.timing(colorAnimation, {
+                Animated.timing(testColorAnimation, {
                     toValue: 1,
                     duration: timing,
                     useNativeDriver: true,
@@ -53,7 +51,7 @@ export default function HabitButton({ statsUpdate, habitColor }: props) {
                     tension: 20,
                     useNativeDriver: true,
                 }),
-                Animated.timing(colorAnimation, {
+                Animated.timing(testColorAnimation, {
                     toValue: 0,
                     duration: timing,
                     useNativeDriver: true,
@@ -63,7 +61,6 @@ export default function HabitButton({ statsUpdate, habitColor }: props) {
         };
     };
     const handlePressedIn = () => {
-
         if (pressed) {
             Animated.timing(springAnimation, {
                 toValue: 0.85,
@@ -80,9 +77,7 @@ export default function HabitButton({ statsUpdate, habitColor }: props) {
     };
 
 
-
     return (
-
         <Pressable
             onPressIn={handlePressedIn}
             onPressOut={handlePressedOut}

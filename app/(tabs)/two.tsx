@@ -6,7 +6,7 @@ const dummyData = {
   start_data: '2024-01-01',
   title: 'Meditation',
   created_at: '2024-01-01',
-  color: '#e6e600',
+  color: 'cyan',
   current_streak: 6,
   total_days: 50,
   date_diff: 60,
@@ -16,100 +16,146 @@ const dummyData = {
 export default function TabTwoScreen() {
 
   const [pressed, setPressed] = useState<boolean>(false)
+  const [progress, setProgress] = useState<number>(0);
   const springAnimation = useRef(new Animated.Value(1)).current;
-  const testColorAnimation = useRef(new Animated.Value(0)).current;
-  const backgroundColorInterpolate = testColorAnimation.interpolate({
+  const colorAnimation = useRef(new Animated.Value(0)).current;
+  const fillAnimation = useRef(new Animated.Value(0)).current;
+  const backgroundColorInterpolate = colorAnimation.interpolate({
     inputRange: [0, 1],
     outputRange: ['transparent', dummyData.color]
   })
   const timing: number = 150
-
 
   const handlePressedOut = () => {
     if (!pressed) {
       Animated.parallel([
         Animated.sequence([
           Animated.timing(springAnimation, {
-            toValue: 1.3,
+            toValue: 1.35,
             duration: timing,
             useNativeDriver: true,
           }),
           Animated.spring(springAnimation, {
-            toValue: 1.1,
+            toValue: 1.2,
             friction: 3,
             tension: 20,
             useNativeDriver: true,
           })
         ]),
-        Animated.timing(testColorAnimation, {
+        Animated.timing(colorAnimation, {
           toValue: 1,
           duration: timing,
           useNativeDriver: true,
         })
-      ]).start()
-      setPressed(true)
+      ]).start();
+      setPressed(true);
 
     } else {
       Animated.parallel([
-        Animated.timing(springAnimation, {
+        Animated.spring(springAnimation, {
           toValue: 1,
-          duration: timing,
+          friction: 3,
+          tension: 20,
           useNativeDriver: true,
         }),
-        Animated.timing(testColorAnimation, {
+        Animated.timing(colorAnimation, {
           toValue: 0,
           duration: timing,
           useNativeDriver: true,
         })
-      ]).start()
-      setPressed(false)
-    }
-  }
-
+      ]).start();
+      setPressed(false);
+    };
+  };
   const handlePressedIn = () => {
-    Animated.timing(springAnimation, {
-      toValue: 0.8,
-      duration: timing,
-      useNativeDriver: true,
-    }).start()
-  }
+
+    if (pressed) {
+      Animated.timing(springAnimation, {
+        toValue: 0.85,
+        duration: timing,
+        useNativeDriver: true,
+      }).start()
+    } else {
+      Animated.timing(springAnimation, {
+        toValue: 0.75,
+        duration: timing,
+        useNativeDriver: true,
+      }).start()
+    }
+  };
+
+  const handleFillAnimation = (action: string) => {
+    if (action === 'touch') {
+      setProgress(progress - 5)
+      Animated.timing(fillAnimation, {
+        toValue: (progress - 5),
+        duration: 100,
+        useNativeDriver: true,
+      }).start()
+    } else if (action === 'hold') {
+      setProgress(0)
+      Animated.timing(fillAnimation, {
+        toValue: 0,
+        duration: 100,
+        useNativeDriver: true,
+      }).start()
+    }
+  };
 
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-
       <Pressable
         onPressIn={handlePressedIn}
         onPressOut={handlePressedOut}
       >
         <Animated.View
-          style={{
-            width: 50,
-            height: 50,
-            borderRadius: 25,
-            backgroundColor: backgroundColorInterpolate,
-            borderWidth: 1,
-            borderColor: (pressed ? 'transparent' : 'gray'),
-            transform: [{
-              scale: springAnimation,
-            }],
-          }} />
+          style={[
+            styles.checkbox,
+            {
+              backgroundColor: backgroundColorInterpolate,
+              borderColor: dummyData.color,
+              transform: [{
+                scale: springAnimation,
+              }]
+            },
+          ]} />
       </Pressable>
-    </View>
+      <Animated.View
+        style={[
+          styles.progressBar,
+          {
+            transform: [{
+              translateY: fillAnimation,
+            }]
+          },
+        ]} />
+      <Pressable onPress={() => handleFillAnimation('touch')} onLongPress={() => handleFillAnimation('hold')}>
+        <Text style={{ height: 50, width: 50, backgroundColor: 'gray', textAlign: 'center', textAlignVertical: 'center' }}> {Math.round((progress / (-40)) * 100)}</Text>
+      </Pressable>
+    </View >
   );
 }
 
 
 const styles = StyleSheet.create({
+  progressBar: {
+    height: 40,
+    width: 40,
+    backgroundColor: 'red',
+    borderWidth: 1,
+    borderColor: 'gray',
+    position: 'relative',
+    zIndex: -1,
+  },
   checkbox: {
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 20,
     height: 40,
     width: 40,
-    backgroundColor: dummyData.color
+    backgroundColor: dummyData.color,
+
   },
   container: {
     flex: 1,
