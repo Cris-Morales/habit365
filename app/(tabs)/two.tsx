@@ -145,7 +145,7 @@ export default function TabTwoScreen() {
                   },
                 ]} >
                 <Svg height="40" width="40" viewBox="0 0 100 100" style={{ zIndex: -1 }}>
-                  <Circle cx='50' cy={bubbleProgress} r='50' stroke='gray' strokeWidth="1" fill='cyan' style={{ position: 'absolute' }} />
+                  <Circle cx='50' cy={bubbleProgress} r='50' stroke='gray' strokeWidth="1" fill='cyan' />
                 </Svg>
               </Animated.View>
             </Animated.View>
@@ -177,7 +177,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 20,
-    marginHorizontal: 5,
+    marginRight: 10,
+    marginVertical: 10,
     height: 40,
     width: 40,
     backgroundColor: dummyData.color,
