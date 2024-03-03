@@ -13,9 +13,7 @@ interface props {
     habitData: habitData;
 }
 interface habitData {
-    start_data: string;
     title: string;
-    created_at: string;
     color: string;
     current_streak: number;
     total_days: number;
@@ -24,7 +22,7 @@ interface habitData {
 }
 
 
-export default function HabitRow({ habitData }: props) {
+export default function HabitRow({ habitData }: any) {
     const [streak, setStreak] = useState<number>(habitData.current_streak)
     const [total, setTotal] = useState<number>(habitData.total_days)
     const [perHit, setPerHit] = useState<number>(Math.round(total / habitData.date_diff * 1000) / 10)
@@ -43,8 +41,6 @@ export default function HabitRow({ habitData }: props) {
             data: `${total} / ${habitData.date_diff}`
         }
     ]
-
-
 
     const openHabitModal = () => {
         router.navigate(
@@ -94,7 +90,6 @@ export default function HabitRow({ habitData }: props) {
                     flex: 0.75,
                     justifyContent: 'center',
                 }}>
-
                     <Text style={styles.habitText}>
                         {habitData.title}
                     </Text>
@@ -150,7 +145,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         width: 65,
-        height: 60,
+        height: 65,
         borderWidth: 1,
         borderColor: 'gray',
         borderRadius: 10,
