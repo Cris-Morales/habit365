@@ -64,11 +64,19 @@ export default function HabitButton({ statsUpdate, habitColor }: props) {
     };
     const handlePressedIn = () => {
 
-        Animated.timing(springAnimation, {
-            toValue: 0.8,
-            duration: timing * 0.50,
-            useNativeDriver: true,
-        }).start()
+        if (pressed) {
+            Animated.timing(springAnimation, {
+                toValue: 0.9,
+                duration: timing * 0.50,
+                useNativeDriver: true,
+            }).start()
+        } else {
+            Animated.timing(springAnimation, {
+                toValue: 0.8,
+                duration: timing * 0.50,
+                useNativeDriver: true,
+            }).start()
+        }
     };
 
 
