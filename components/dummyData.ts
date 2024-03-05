@@ -34,7 +34,7 @@ const dummyData: dataShape[] = [
                 total_days: 35,
                 date_diff: 60,
                 id: 3
-            }
+            },
         ]
     },
     {
@@ -56,7 +56,7 @@ const dummyData: dataShape[] = [
                 id: 1
             },
             {
-                title: 'See the Sun',
+                title: 'See the Sunrise',
                 color: '#ffff00',
                 current_streak: 6,
                 total_days: 56,
@@ -100,7 +100,7 @@ const dummyData: dataShape[] = [
                 id: 8
             },
             {
-                title: 'See Sun Set',
+                title: 'See the Sunset',
                 color: '#ff8c00',
                 current_streak: 6,
                 total_days: 20,

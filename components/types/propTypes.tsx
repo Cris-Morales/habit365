@@ -7,9 +7,7 @@ export interface routine {
     id: number
 }
 export interface habit {
-    start_data: string;
     title: string;
-    created_at: string;
     color: string;
     current_streak: number;
     total_days: number;

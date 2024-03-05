@@ -5,7 +5,7 @@ import RoutineHeader from './RoutineHeader';
 import HabitRow from './HabitRow';
 import { dataShape } from './types/propTypes';
 
-export default function RoutineComponent({ routine_data, routine_habits }: dataShape) {
+export default function RoutineComponent({ routine_data, routine_habits }: any) {
 
     // makes db query to routine entries
     // routes to routine modal
@@ -13,16 +13,17 @@ export default function RoutineComponent({ routine_data, routine_habits }: dataS
     // edge cases, what happens if a habit's routine is null?
     // just doesn't display the routine row component
     // displays that list on top
+    const [routineProgress, setRoutineProgress] = useState<number>(0)
 
     return (
         <View style={styles.routineContainer}>
-            <RoutineHeader routine_data={routine_data} />
+            <RoutineHeader routine_data={routine_data} routineProgress={routineProgress} routineLength={routine_habits.length} />
             <FlatList
                 scrollEnabled={true}
                 data={routine_habits}
                 keyExtractor={(item) => item.title}
                 renderItem={({ item }) => {
-                    return (<HabitRow habitData={item} />)
+                    return (<HabitRow habitData={item} setRoutineProgress={setRoutineProgress} routineProgress={routineProgress} />)
                 }}
             />
         </View>
@@ -37,8 +38,6 @@ const styles = StyleSheet.create({
         borderRadius: 16,
     },
     container: {
-        flex: 1,
-        marginHorizontal: 16,
     },
     item: {
         backgroundColor: '#f9c2ff',
@@ -51,5 +50,10 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
+    },
+    separator: {
+        marginVertical: 30,
+        height: 1,
+        width: '80%',
     },
 });

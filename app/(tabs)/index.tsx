@@ -2,6 +2,7 @@ import { StyleSheet, FlatList } from 'react-native';
 import { View } from '@/components/Themed';
 import HabitRow from '@/components/HabitRow';
 import dummyData from '@/components/dummyData';
+import RoutineComponent from '@/components/RoutineComponent';
 
 
 export default function TabOneScreen() {
@@ -29,7 +30,7 @@ export default function TabOneScreen() {
         keyExtractor={(item, index) => item.routine_data.title + index}
         renderItem={({ item }) => {
           return (
-            routineLists(item)
+            < RoutineComponent routine_data={item.routine_data} routine_habits={item.routine_habits} />
           )
         }}
       />
@@ -42,7 +43,7 @@ export default function TabOneScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginHorizontal: 16,
+    marginHorizontal: 5,
   },
   item: {
     backgroundColor: '#f9c2ff',

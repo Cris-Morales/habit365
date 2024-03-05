@@ -10,7 +10,7 @@ interface listData {
 }
 
 
-export default function HabitRow({ habitData }: any) {
+export default function HabitRow({ habitData, setRoutineProgress, routineProgress }: any) {
     const [streak, setStreak] = useState<number>(habitData.current_streak)
     const [total, setTotal] = useState<number>(habitData.total_days)
     const [perHit, setPerHit] = useState<number>(Math.round(total / habitData.date_diff * 1000) / 10)
@@ -46,10 +46,12 @@ export default function HabitRow({ habitData }: any) {
         if (isChecked) {
             setStreak(streak + 1)
             setTotal(total + 1)
+            setRoutineProgress(routineProgress + 1)
             setPerHit(Math.round((total + 1) / habitData.date_diff * 1000) / 10)
         } else {
             setStreak(streak - 1)
             setTotal(total - 1)
+            setRoutineProgress(routineProgress - 1)
             setPerHit(Math.round((total - 1) / habitData.date_diff * 1000) / 10)
         }
         // triggers a database update, do not update state until we receive an okay from the transaction function, ie. The Tanstack Query function. For now it's just a simple state function update.
@@ -75,7 +77,7 @@ export default function HabitRow({ habitData }: any) {
         <View style={styles.habitView}>
             <Pressable onLongPress={openHabitModal} style={styles.modalButton}>
                 <View style={{
-                    flex: 0.75,
+                    flex: 1,
                     justifyContent: 'center',
                 }}>
                     <Text style={styles.habitText}>
@@ -111,7 +113,7 @@ const styles = StyleSheet.create({
         borderColor: 'gray',
         borderRadius: 8,
         paddingLeft: 5,
-        marginHorizontal: 2,
+        marginHorizontal: 1,
         marginTop: 5,
     },
     modalButton: {
@@ -120,8 +122,8 @@ const styles = StyleSheet.create({
     habitText: {
         flexDirection: 'row',
         marginRight: 10,
-        justifyContent: 'center',
-        textAlign: 'justify',
+        justifyContent: 'flex-start',
+        textAlign: 'left',
         alignItems: 'center',
         fontSize: 16,
     },

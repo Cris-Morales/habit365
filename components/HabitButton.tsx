@@ -17,7 +17,9 @@ export default function HabitButton({ statsUpdate, habitColor }: props) {
         inputRange: [0, 1],
         outputRange: ['transparent', habitColor]
     })
-    const timing: number = 150
+    const timing: number = 100;
+    const tension: number = 65;
+    const friction: number = 4;
 
     const handlePressedOut = () => {
         if (!pressed) {
@@ -31,8 +33,8 @@ export default function HabitButton({ statsUpdate, habitColor }: props) {
                     }),
                     Animated.spring(springAnimation, {
                         toValue: 1.2,
-                        friction: 3,
-                        tension: 20,
+                        friction: friction,
+                        tension: tension,
                         useNativeDriver: true,
                     })
                 ]),
@@ -49,8 +51,8 @@ export default function HabitButton({ statsUpdate, habitColor }: props) {
             Animated.parallel([
                 Animated.spring(springAnimation, {
                     toValue: 1,
-                    friction: 3,
-                    tension: 20,
+                    friction: friction,
+                    tension: tension,
                     useNativeDriver: true,
                 }),
                 Animated.timing(colorAnimation, {
@@ -65,17 +67,29 @@ export default function HabitButton({ statsUpdate, habitColor }: props) {
     const handlePressedIn = () => {
 
         if (pressed) {
-            Animated.timing(springAnimation, {
+            Animated.spring(springAnimation, {
                 toValue: 0.85,
-                duration: timing,
+                friction: friction * 1.5,
+                tension: tension * 2,
                 useNativeDriver: true,
             }).start()
+            // Animated.timing(springAnimation, {
+            //     toValue: 0.85,
+            //     duration: 75,
+            //     useNativeDriver: true,
+            // }).start()
         } else {
-            Animated.timing(springAnimation, {
+            Animated.spring(springAnimation, {
                 toValue: 0.75,
-                duration: timing,
+                friction: friction * 1.5,
+                tension: tension * 2,
                 useNativeDriver: true,
             }).start()
+            // Animated.timing(springAnimation, {
+            //     toValue: 0.75,
+            //     duration: 75,
+            //     useNativeDriver: true,
+            // }).start()
         }
     };
 
