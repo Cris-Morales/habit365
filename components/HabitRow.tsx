@@ -115,17 +115,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        // borderWidth: 1,
-        // borderColor: 'gray',
         borderRadius: 16,
-        paddingLeft: 5,
-        marginHorizontal: 2.5,
+        paddingHorizontal: 5,
+        marginHorizontal: 5,
         marginVertical: 2.5,
         backgroundColor: '#1c1c1c'
     },
     modalButton: {
-        flex: 1,
-        backgroundColor: 'transparent'
+        backgroundColor: 'transparent',
+        width: '25%'
 
     },
     habitText: {

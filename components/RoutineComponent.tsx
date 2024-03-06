@@ -18,14 +18,16 @@ export default function RoutineComponent({ routine_data, routine_habits }: any) 
     return (
         <View style={styles.routineContainer}>
             <RoutineHeader routine_data={routine_data} routineProgress={routineProgress} routineLength={routine_habits.length} />
-            <FlatList
-                scrollEnabled={true}
-                data={routine_habits}
-                keyExtractor={(item) => item.title}
-                renderItem={({ item }) => {
-                    return (<HabitRow habitData={item} setRoutineProgress={setRoutineProgress} routineProgress={routineProgress} />)
-                }}
-            />
+            <View style={styles.habitRowContainer}>
+                <FlatList
+                    scrollEnabled={true}
+                    data={routine_habits}
+                    keyExtractor={(item) => item.title}
+                    renderItem={({ item }) => {
+                        return (<HabitRow habitData={item} setRoutineProgress={setRoutineProgress} routineProgress={routineProgress} />)
+                    }}
+                />
+            </View>
         </View>
     )
 }
@@ -36,8 +38,17 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'gray',
         borderRadius: 16,
+        paddingBottom: 2.5,
+        flex: 1,
+        marginVertical: 2.5
     },
-    container: {
+    habitRowContainer: {
+        flex: 1,
+        alignSelf: 'center',
+        alignItems: 'center',
+        width: '99%',
+        backgroundColor: 'transparent',
+        paddingHorizontal: 10
     },
     item: {
         backgroundColor: '#f9c2ff',
