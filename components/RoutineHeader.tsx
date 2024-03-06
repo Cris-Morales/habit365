@@ -20,14 +20,14 @@ export default function RoutineHeader({ routine_data, routineProgress, routineLe
     }
 
     return (
-        <View style={styles.habitView}>
+        <View style={styles.routineHeader}>
             <RoutineFeedback routineProgress={routineProgress} routineLength={routineLength} routine_data={routine_data} />
             <Pressable onLongPress={openRoutineModal} style={styles.modalButton}>
                 <View style={{
                     flex: 0.75,
                     justifyContent: 'center',
                 }}>
-                    <Text style={styles.habitText}>
+                    <Text style={styles.routineText}>
                         {routine_data.title}
                     </Text>
                 </View>
@@ -40,7 +40,7 @@ export default function RoutineHeader({ routine_data, routineProgress, routineLe
 }
 
 const styles = StyleSheet.create({
-    habitView: {
+    routineHeader: {
         height: 100,
         paddingVertical: 2,
         flexDirection: 'row',
@@ -54,11 +54,11 @@ const styles = StyleSheet.create({
     modalButton: {
         flex: 1,
     },
-    habitText: {
+    routineText: {
         flexDirection: 'row',
         marginRight: 10,
         justifyContent: 'center',
-        textAlign: 'justify',
+        textAlign: 'left',
         alignItems: 'center',
         fontSize: 20,
     },

@@ -65,7 +65,9 @@ export default function HabitRow({ habitData, setRoutineProgress, routineProgres
                 </Text>
                 <Text style={{
                     fontWeight: 'bold',
-                    color: habitData.color
+                    color: habitData.color,
+                    backgroundColor: 'transparent'
+
                 }}>
                     {item.data}
                 </Text>
@@ -79,6 +81,8 @@ export default function HabitRow({ habitData, setRoutineProgress, routineProgres
                 <View style={{
                     flex: 1,
                     justifyContent: 'center',
+                    backgroundColor: 'transparent'
+
                 }}>
                     <Text style={styles.habitText}>
                         {habitData.title}
@@ -88,6 +92,8 @@ export default function HabitRow({ habitData, setRoutineProgress, routineProgres
             <HabitButton statsUpdate={statsUpdate} habitColor={habitData.color} />
             <View style={{
                 marginHorizontal: 2,
+                backgroundColor: 'transparent'
+
             }}>
                 <FlatList
                     horizontal={true}
@@ -109,15 +115,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderWidth: 1,
-        borderColor: 'gray',
-        borderRadius: 8,
+        // borderWidth: 1,
+        // borderColor: 'gray',
+        borderRadius: 16,
         paddingLeft: 5,
-        marginHorizontal: 1,
-        marginTop: 5,
+        marginHorizontal: 2.5,
+        marginVertical: 2.5,
+        backgroundColor: '#1c1c1c'
     },
     modalButton: {
         flex: 1,
+        backgroundColor: 'transparent'
+
     },
     habitText: {
         flexDirection: 'row',
@@ -126,10 +135,14 @@ const styles = StyleSheet.create({
         textAlign: 'left',
         alignItems: 'center',
         fontSize: 16,
+        backgroundColor: 'transparent'
+
     },
     statsContainer: {
         flexDirection: 'row',
         alignContent: 'center',
+        backgroundColor: 'transparent'
+
     },
     habitStats: {
         alignItems: 'center',
@@ -140,6 +153,8 @@ const styles = StyleSheet.create({
         borderColor: 'gray',
         borderRadius: 10,
         marginHorizontal: 2,
-        alignSelf: 'center'
+        alignSelf: 'center',
+        backgroundColor: 'transparent'
+
     },
 });

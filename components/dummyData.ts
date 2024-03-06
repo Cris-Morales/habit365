@@ -39,7 +39,7 @@ const dummyData: dataShape[] = [
     },
     {
         routine_data: {
-            title: 'Morning',
+            title: 'Post-Morning Coffee Dookie Sit-down',
             color: '#ff8c00',
             current_streak: 6,
             total_days: 50,

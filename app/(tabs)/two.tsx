@@ -71,7 +71,6 @@ export default function TabTwoScreen() {
     <View style={{
       flex: 1,
     }}>
-      <RoutineComponent routine_data={dummyData.routine_data} routine_habits={dummyData.routine_habits} />
     </View>
   );
 }
