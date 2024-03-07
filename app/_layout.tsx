@@ -52,7 +52,7 @@ function RootLayoutNav() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false, navigationBarHidden: false }} />
         <Stack.Screen name="habit-details" options={{
           title: 'Habit Options',
           presentation: 'modal'
