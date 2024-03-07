@@ -33,7 +33,7 @@ export default function HabitRow({ habitData, setRoutineProgress, routineProgres
     const openHabitModal = () => {
         router.navigate(
             {
-                pathname: 'modal',
+                pathname: 'habit-details',
                 params: {
                     id: habitData.id,
                     title: habitData.title

@@ -9,7 +9,7 @@ interface habitParams {
   id: number;
 }
 
-export default function ModalScreen() {
+export default function RoutineDetails() {
   const params: any = useLocalSearchParams(); // see habitParams, will not accept it as a type interface.
 
 
@@ -19,15 +19,17 @@ export default function ModalScreen() {
   // ... don't think I can pass props to modal, maybe if I use useContext
   // but it's looking like I need to fetch as it loads, and create local state.
 
-  // adding in dummy data to start making the stats and options, working with forms, and constructing the props and mock fetches.
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{params.title}</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      {/* <EditScreenInfo path="app/modal.tsx" /> */}
-
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
+      <Text>Best 100% Streak</Text>
+      <Text>Average Completion</Text>
+      <Text>Edit Routine</Text>
+      <Text>Delete Routine (Red)</Text>
+      <Text>Created At</Text>
+      <Text>Start Date</Text>
+      <Text>Calender Coming Soon!</Text>
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
     </View>
   );

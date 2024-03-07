@@ -1,11 +1,10 @@
-import { StyleSheet, Pressable, FlatList } from 'react-native';
-import { useState } from 'react';
+import { StyleSheet, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { router } from 'expo-router'
 import RoutineFeedback from './RoutineFeedback';
 
 
-export default function RoutineHeader({ routine_data, routineProgress, routineLength }: any) {
+export default function JournalHeader({ routine_data, routineProgress, routineLength }: any) {
 
     const openRoutineModal = () => {
         router.navigate(

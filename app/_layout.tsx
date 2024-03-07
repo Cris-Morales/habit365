@@ -4,8 +4,8 @@ import { useFonts } from 'expo-font';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-
 import { useColorScheme } from '@/components/useColorScheme';
+import { Text } from '@/components/Themed';
 
 
 export {
@@ -53,7 +53,12 @@ function RootLayoutNav() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{
+        <Stack.Screen name="habit-details" options={{
+          title: 'Habit Options',
+          presentation: 'modal'
+        }} />
+        <Stack.Screen name="routine-details" options={{
+          title: 'Routine Options',
           presentation: 'modal'
         }} />
       </Stack>
