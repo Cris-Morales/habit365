@@ -5,10 +5,7 @@ import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanima
 import ColorPicker, { Panel2, OpacitySlider, colorKit, BrightnessSlider, InputWidget } from 'reanimated-color-picker';
 import type { returnedResults } from 'reanimated-color-picker';
 
-export default function AppColorPicker({ habitColor, setHabitColor }: any) {
-    const initialColor = colorKit.randomRgbColor().hex();
-    const selectedColor = useSharedValue(initialColor);
-    const backgroundColorStyle = useAnimatedStyle(() => ({ backgroundColor: selectedColor.value }));
+export default function AppColorPicker({ selectedColor, backgroundColorStyle }: any) {
 
     const onColorSelect = (color: returnedResults) => {
         'worklet';
@@ -24,22 +21,15 @@ export default function AppColorPicker({ habitColor, setHabitColor }: any) {
                         sliderThickness={25}
                         thumbSize={30}
                         thumbShape='rect'
-                        onChange={onColorSelect}
-                    >
-                        {/* <View style={styles.previewTxtContainer}> */}
+                        onChange={onColorSelect}>
                         <InputWidget
                             defaultFormat='HEX'
                             formats={['HEX']}
                             inputStyle={[{ paddingVertical: 2, borderColor: '#707070', fontSize: 12, marginLeft: 5 }, backgroundColorStyle]}
-                            iconColor='#707070'
-                        />
-                        {/* </View> */}
+                            iconColor='#707070' />
                         <Panel2 style={styles.panelStyle} thumbShape='ring' reverseVerticalChannel />
-
                         <BrightnessSlider style={styles.sliderStyle} />
-
                         <OpacitySlider style={styles.sliderStyle} />
-
                     </ColorPicker>
                 </View>
             </KeyboardAvoidingView>

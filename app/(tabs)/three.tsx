@@ -1,26 +1,18 @@
 import { StyleSheet, Pressable, FlatList, Button, Animated } from 'react-native';
 import { useState, useRef } from 'react';
 import { Text, View } from '@/components/Themed';
-import AppColorPicker from '@/components/AppColorPicker';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import AppDatePicker from '@/components/AppDatePicker';
 
 
 
-export default function TabTwoScreen() {
+export default function TabThreeScreen() {
+
 
     return (
-        <View style={{
-            flex: 1,
-        }}>
-            <Text>Habit Name</Text>
-            <Text>Start Date</Text>
-            <Text>Intention (Optional)</Text>
-            <Text>Frequency: Everyday, Select Days</Text>
-            <Text>Add to Routine</Text>
-            <Text>Create Habit</Text>
-        </View>
+        <>
+            <AppDatePicker />
+        </>
     );
-}
-
-
-const styles = StyleSheet.create({
-});
+};
