@@ -12,7 +12,6 @@ export default function TabThreeScreen() {
 
     return (
         <>
-            <AppDatePicker />
         </>
     );
 };

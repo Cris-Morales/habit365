@@ -4,14 +4,14 @@ import { Text, View } from '@/components/Themed';
 import AppColorPicker from '@/components/AppColorPicker';
 import { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import DayButton from '@/components/DayButton';
-const weekday: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+import AppDatePicker from '@/components/AppDatePicker';
+const weekdays: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 
 export default function TabTwoScreen() {
   const [habitName, setHabitName] = useState<string>('');
-  const [startDate, setStartDate] = useState<Date>(new Date()) // DATE -  passed to database in UTC format YYYY-MM-DD, or whatever I feel like
+  const [startDate, setStartDate] = useState<Date | undefined>(new Date()) // DATE -  passed to database in UTC format YYYY-MM-DD, or whatever I feel like
   const [skipDays, setSkipDays] = useState<boolean[]>(Array(7).fill(true));
-
   const [showValues, setShowValues] = useState<boolean>(false);
   const selectedColor = useSharedValue('#75faff');
   const backgroundColorStyle = useAnimatedStyle(() => ({ backgroundColor: selectedColor.value }));
@@ -20,27 +20,22 @@ export default function TabTwoScreen() {
 
   return (
     <ScrollView style={styles.createHabitContainer}>
-      {/* <KeyboardAvoidingView> */}
       <View style={styles.formContainer}>
         <Text style={styles.formTitle}>Habit Name</Text>
-        <TextInput style={styles.textInputForm} placeholder='Meditation' onChangeText={setHabitName} />
+        <TextInput style={styles.textInputForm} maxLength={28} placeholderTextColor={'white'} placeholder='ex. Meditation' onChangeText={setHabitName} />
       </View>
       <View style={styles.divider} />
-      <View style={styles.formContainer}>
+      <View style={[styles.formContainer,]}>
         <Text style={styles.formTitle}>Start Date</Text>
-        <Text style={styles.textInputForm}>Date picker here, with short date in text input style</Text>
+        <AppDatePicker date={startDate} setDate={setStartDate} weekdays={weekdays} />
       </View>
       <View style={styles.divider} />
-
-
-
-      {/* input field */}
       <View style={styles.formContainer}>
-        <Text>Frequency:</Text>
+        <Text style={styles.formTitle}>Frequency:</Text>
         <FlatList
           horizontal={true}
           scrollEnabled={true}
-          data={weekday}
+          data={weekdays}
           keyExtractor={(item, index) => item + index}
           renderItem={({ item, index }) => {
             return (
@@ -49,26 +44,30 @@ export default function TabTwoScreen() {
           }}
         />
       </View >
-      {/* date picker */}
-      <Text>Add to Routine</Text>
-
-      {/* selector from routines (fetched?) */}
-      <View style={{ borderWidth: 1, borderColor: 'gray' }}>
+      <View style={styles.divider} />
+      <View style={styles.formContainer}>
+        <Text style={styles.formTitle}>Customize Color</Text>
         <AppColorPicker selectedColor={selectedColor} backgroundColorStyle={backgroundColorStyle} />
       </View>
-      {/* overide the heabitColor state with the randomly chose one from the AppColorPicker */}
-      <Text>Create Habit</Text>
-      {/* button */}
+      <View style={styles.divider} />
       <View style={styles.formContainer}>
-        <Text>Intention (Optional)</Text>
-        <TextInput style={styles.textInputForm} placeholder='Habit Intention' onChangeText={setHabitName} />
+        <Text style={styles.formTitle}>Intention (Optional)</Text>
+        <TextInput style={styles.textInputForm} placeholderTextColor={'white'} placeholder='ex. To Embrass Mindfulness' onChangeText={setHabitName} />
       </View>
+      <View style={styles.divider} />
+      <View style={styles.formContainer}>
+        <Text style={styles.formTitle}>Add to Routine (Optional)</Text>
+        <Pressable>
+          <Text>
+            Drop Down Menu Here
+          </Text>
+        </Pressable>
+      </View>
+      <View style={styles.divider} />
       <View style={styles.submitButton} >
         <Button onPress={() => setShowValues(!showValues)} title='Create Habit' accessibilityLabel='Create your new habit.'></Button>
       </View>
-      {showValues ? <Text>{selectedColor.value}, {habitName}, {startDate.toLocaleDateString()}, {startDate.getDay()}, {skipDays.toString()}</Text> : null}
-      {/* Testing inputs */}
-      {/* </KeyboardAvoidingView> */}
+      {showValues ? <Text>{selectedColor.value}, {habitName}, {startDate?.toLocaleDateString()}, , {skipDays.toString()}</Text> : null}
     </ScrollView>
   );
 }
@@ -98,7 +97,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     marginVertical: 10,
-    paddingHorizontal: 30
+    paddingHorizontal: 30,
   },
   textInputForm: {
     borderWidth: 1,
@@ -108,9 +107,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#696969',
     padding: 5,
     paddingLeft: 10,
-  },
-  weekdayButton: {
-    width: '14%'
+    height: 40,
   },
   divider: {
     flexDirection: 'row',
