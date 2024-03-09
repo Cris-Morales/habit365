@@ -1,11 +1,14 @@
 import React from 'react';
-import { KeyboardAvoidingView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Pressable, StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import { Text, View } from './Themed';
+import { useState } from 'react';
 
 import ColorPicker, { Panel2, OpacitySlider, colorKit, BrightnessSlider, InputWidget } from 'reanimated-color-picker';
 import type { returnedResults } from 'reanimated-color-picker';
 
 export default function AppColorPicker({ selectedColor, backgroundColorStyle }: any) {
+    const [showPicker, setShowPicker] = useState<boolean>(false)
 
     const onColorSelect = (color: returnedResults) => {
         'worklet';
@@ -15,7 +18,7 @@ export default function AppColorPicker({ selectedColor, backgroundColorStyle }: 
     return (
         <Animated.View style={styles.container}>
             <KeyboardAvoidingView behavior='position'>
-                <View style={styles.pickerContainer}>
+                <View style={styles.pickerContainer} >
                     <ColorPicker
                         value={selectedColor.value}
                         sliderThickness={25}
@@ -27,6 +30,7 @@ export default function AppColorPicker({ selectedColor, backgroundColorStyle }: 
                             formats={['HEX']}
                             inputStyle={[{ paddingVertical: 2, borderColor: '#707070', fontSize: 12, marginLeft: 5 }, backgroundColorStyle]}
                             iconColor='#707070' />
+                        {/* <HandleShowPicker /> */}
                         <Panel2 style={styles.panelStyle} thumbShape='ring' reverseVerticalChannel />
                         <BrightnessSlider style={styles.sliderStyle} />
                         <OpacitySlider style={styles.sliderStyle} />
@@ -45,7 +49,7 @@ const styles = StyleSheet.create({
     pickerContainer: {
         alignSelf: 'center',
         width: 300,
-        backgroundColor: '#202124',
+        backgroundColor: 'gray',//'#202124',
         padding: 20,
         borderRadius: 20,
         shadowColor: '#000',
