@@ -31,7 +31,7 @@ export default function AppDatePicker() {
                     onChange={onChange}
                 />
             )}
-            <Text>selected: {date?.toLocaleString()}</Text>
+            <Text>selected: {date?.toLocaleString()}, {date?.getDay()}</Text>
         </SafeAreaView>
     );
 };
