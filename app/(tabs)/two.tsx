@@ -25,6 +25,9 @@ export default function TabTwoScreen() {
   const backgroundColorStyle = useAnimatedStyle(() => ({ backgroundColor: selectedColor.value }));
 
   const handleSubmit = () => {
+    // submit selected state with a fetch
+    // display loading feedback
+    // switch to journal page, which should fetch an updated list
     if (canSubmit) {
       setShowValues(!showValues);
     }
