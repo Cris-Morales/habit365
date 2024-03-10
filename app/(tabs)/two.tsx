@@ -1,4 +1,4 @@
-import { StyleSheet, Pressable, FlatList, Button, Animated, TextInput, KeyboardAvoidingView, ViewStyle } from 'react-native';
+import { StyleSheet, Pressable, FlatList, Button, TextInput, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import { useState, useRef } from 'react';
 import { Text, View } from '@/components/Themed';
@@ -6,19 +6,29 @@ import AppColorPicker from '@/components/AppColorPicker';
 import { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import DayButton from '@/components/DayButton';
 import AppDatePicker from '@/components/AppDatePicker';
+import { Picker } from '@react-native-picker/picker';
 const weekdays: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+// import dummyData from '@/components/dummyData';
+
+const dummyData: string[] = ['Undefined', 'Daily', 'Post-Morning Coffee Dookie Sit-down', 'Evening']
 
 
 export default function TabTwoScreen() {
-  const [habitName, setHabitName] = useState<string>('');
+  const [habitName, setHabitName] = useState<string | undefined>();
   const [startDate, setStartDate] = useState<Date | undefined>(new Date()) // DATE -  passed to database in UTC format YYYY-MM-DD, or whatever I feel like
+  const [selectedRoutine, setSelectedRoutine] = useState<string>('');
   const [skipDays, setSkipDays] = useState<boolean[]>(Array(7).fill(true));
   const [showValues, setShowValues] = useState<boolean>(false);
+  const [intention, setIntention] = useState<string>('');
+  const [canSubmit, setCanSubmit] = useState<boolean>(false);
   const selectedColor = useSharedValue('#75faff');
   const backgroundColorStyle = useAnimatedStyle(() => ({ backgroundColor: selectedColor.value }));
-  const [keyboardOffset, setKeyboardOffset] = useState<boolean>(false);
 
-
+  const handleSubmit = () => {
+    if (canSubmit) {
+      setShowValues(!showValues);
+    }
+  }
 
   return (
     <GestureHandlerRootView style={styles.createHabitContainer}>
@@ -26,7 +36,15 @@ export default function TabTwoScreen() {
         <ScrollView style={styles.createHabitContainer}>
           <View style={styles.formContainer}>
             <Text style={styles.formTitle}>Habit Name</Text>
-            <TextInput style={styles.textInputForm} maxLength={28} placeholderTextColor={'white'} placeholder='ex. Meditation' onChangeText={setHabitName} />
+            <TextInput style={styles.textInputForm} maxLength={28} placeholderTextColor={'white'} placeholder='ex. Meditation' onChangeText={(text) => {
+              if (text.length) {
+                setCanSubmit(true);
+                setHabitName(text);
+              } else {
+                setCanSubmit(false);
+                setHabitName(text);
+              }
+            }} />
           </View>
           <View style={styles.divider} />
           <View style={[styles.formContainer,]}>
@@ -58,44 +76,32 @@ export default function TabTwoScreen() {
           <View style={styles.divider} />
           <View style={styles.formContainer}>
             <Text style={styles.formTitle}>Intention (Optional)</Text>
-            <TextInput style={styles.textInputForm} placeholderTextColor={'white'} placeholder='ex. To Embrace Mindfulness' onChangeText={setHabitName} />
+            <TextInput style={styles.textInputForm} placeholderTextColor={'white'} placeholder='ex. To Embrace Mindfulness' onChangeText={setIntention} />
           </View>
           <View style={styles.divider} />
           <View style={styles.formContainer}>
             <Text style={styles.formTitle}>Add to Routine (Optional)</Text>
-            <Pressable>
-              <Text>
-                Drop Down Menu Here
-              </Text>
-            </Pressable>
+            <Picker
+              style={[styles.textInputForm, { marginBottom: 15 }]}
+              selectedValue={selectedRoutine}
+              onValueChange={(itemValue, itemIndex) => setSelectedRoutine(itemValue)}>
+              {dummyData.map((routine, index) => <Picker.Item key={routine + '-' + index} label={routine} value={routine} />)}
+            </Picker>
           </View>
           <View style={styles.divider} />
-          <View style={styles.submitButton} >
-            <Button onPress={() => setShowValues(!showValues)} title='Create Habit' accessibilityLabel='Create your new habit.'></Button>
-          </View>
-          {showValues ? <Text>{selectedColor.value}, {habitName}, {startDate?.toLocaleDateString()}, , {skipDays.toString()}</Text> : null}
+          <TouchableOpacity style={[styles.submitButton, { backgroundColor: canSubmit ? '#4fa8cc' : 'gray' }]} onPress={() => handleSubmit()} accessibilityLabel='Create your new habit.'
+            activeOpacity={0.85}>
+            <Text>Create Habit</Text>
+          </TouchableOpacity>
+          {showValues ? <Text>{selectedColor.value}, {habitName}, {startDate?.toLocaleDateString()}, {intention}, {skipDays.toString()}, {selectedRoutine}</Text> : null}
         </ScrollView>
       </KeyboardAvoidingView>
-
     </GestureHandlerRootView >
   );
 }
 
 
 const styles = StyleSheet.create({
-  dayButtonsContainer: {
-    margin: 5,
-    padding: 5,
-    width: 30,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: 'gray',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  dayButtons: {
-    textAlign: 'center',
-  },
   createHabitContainer: {
     flex: 1,
     alignContent: 'center',
@@ -127,11 +133,15 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     flexDirection: 'row',
-    marginVertical: 10,
-    width: '100%',
+    marginTop: 10,
+    marginBottom: 20,
+    width: '50%',
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'gray',
+    height: 40,
+    alignSelf: 'center'
   }
 });

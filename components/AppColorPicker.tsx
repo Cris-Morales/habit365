@@ -1,14 +1,12 @@
 import React from 'react';
-import { KeyboardAvoidingView, Pressable, StyleSheet } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
-import { Text, View } from './Themed';
-import { useState } from 'react';
+import { KeyboardAvoidingView, StyleSheet } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { View } from './Themed';
 
-import ColorPicker, { Panel2, OpacitySlider, colorKit, BrightnessSlider, InputWidget } from 'reanimated-color-picker';
+import ColorPicker, { Panel2, OpacitySlider, BrightnessSlider, InputWidget } from 'reanimated-color-picker';
 import type { returnedResults } from 'reanimated-color-picker';
 
 export default function AppColorPicker({ selectedColor, backgroundColorStyle }: any) {
-    const [showPicker, setShowPicker] = useState<boolean>(false)
 
     const onColorSelect = (color: returnedResults) => {
         'worklet';
@@ -30,7 +28,6 @@ export default function AppColorPicker({ selectedColor, backgroundColorStyle }: 
                             formats={['HEX']}
                             inputStyle={[{ paddingVertical: 2, borderColor: '#707070', fontSize: 12, marginLeft: 5 }, backgroundColorStyle]}
                             iconColor='#707070' />
-                        {/* <HandleShowPicker /> */}
                         <Panel2 style={styles.panelStyle} thumbShape='ring' reverseVerticalChannel />
                         <BrightnessSlider style={styles.sliderStyle} />
                         <OpacitySlider style={styles.sliderStyle} />
@@ -78,48 +75,6 @@ const styles = StyleSheet.create({
     sliderStyle: {
         borderRadius: 20,
         marginTop: 20,
-
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-
-        elevation: 5,
-    },
-    previewTxtContainer: {
-        paddingBottom: 20,
-        marginBottom: 20,
-        borderBottomWidth: 1,
-        borderColor: '#bebdbe',
-    },
-    openButton: {
-        width: '100%',
-        borderRadius: 20,
-        paddingHorizontal: 40,
-        paddingVertical: 10,
-        backgroundColor: '#fff',
-
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-
-        elevation: 5,
-    },
-    closeButton: {
-        position: 'absolute',
-        bottom: 10,
-        borderRadius: 20,
-        paddingHorizontal: 40,
-        paddingVertical: 10,
-        alignSelf: 'center',
-        backgroundColor: '#fff',
 
         shadowColor: '#000',
         shadowOffset: {
