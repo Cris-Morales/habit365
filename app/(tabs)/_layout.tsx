@@ -49,14 +49,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="three"
         options={{
-          title: 'Settings',
-          tabBarIcon: ({ color }) => <IITabBarIcon name="settings-sharp" color={color} />,
+          title: 'Add Routine',
+          tabBarIcon: ({ color }) => <IITabBarIcon name="add-circle-sharp" color={color} />,
         }}
       />
       <Tabs.Screen
         name="four"
         options={{
-          title: 'test',
+          title: 'Settings',
           tabBarIcon: ({ color }) => <IITabBarIcon name="settings-sharp" color={color} />,
         }}
       />

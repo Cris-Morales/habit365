@@ -7,7 +7,7 @@ import { useState } from 'react';
 
 
 
-export default function DayButton({ index, day, skipDays, setSkipDays }: any) {
+export default function DayButton({ index, day, skipDays, setSkipDays, color }: any) {
     const [pressed, setPressed] = useState<boolean>(true);
 
     const handlePress = () => {
@@ -19,7 +19,7 @@ export default function DayButton({ index, day, skipDays, setSkipDays }: any) {
     };
 
     return (
-        <Pressable style={[styles.dayButtonsContainer, { backgroundColor: pressed ? '#4fa8cc' : 'transparent' }]} onPress={handlePress}>
+        <Pressable style={[styles.dayButtonsContainer, { backgroundColor: pressed ? color : 'transparent' }]} onPress={handlePress}>
             <Text style={styles.dayButtons}>
                 {day.charAt(0)}
             </Text>

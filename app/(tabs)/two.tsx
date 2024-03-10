@@ -1,6 +1,6 @@
 import { StyleSheet, Pressable, FlatList, Button, TextInput, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Text, View } from '@/components/Themed';
 import AppColorPicker from '@/components/AppColorPicker';
 import { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
@@ -10,7 +10,7 @@ import { Picker } from '@react-native-picker/picker';
 const weekdays: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 // import dummyData from '@/components/dummyData';
 
-const dummyData: string[] = ['Undefined', 'Daily', 'Post-Morning Coffee Dookie Sit-down', 'Evening']
+const dummyData: string[] = ['N/A', 'Daily', 'Post-Morning Coffee Dookie Sit-down', 'Evening']
 
 
 export default function TabTwoScreen() {
@@ -65,7 +65,7 @@ export default function TabTwoScreen() {
                 keyExtractor={(item, index) => item + index}
                 renderItem={({ item, index }) => {
                   return (
-                    <DayButton index={index} day={item} skipDays={skipDays} setSkipDays={setSkipDays} />
+                    <DayButton index={index} day={item} skipDays={skipDays} setSkipDays={setSkipDays} color={'#4fa8cc'} />
                   )
                 }}
               />
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   },
   formTitle: {
     marginBottom: 10,
-    fontSize: 15,
+    fontSize: 16,
   },
   formContainer: {
     marginVertical: 10,

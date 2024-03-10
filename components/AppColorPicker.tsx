@@ -26,7 +26,7 @@ export default function AppColorPicker({ selectedColor, backgroundColorStyle }: 
                         <InputWidget
                             defaultFormat='HEX'
                             formats={['HEX']}
-                            inputStyle={[{ paddingVertical: 2, borderColor: '#707070', fontSize: 12, marginLeft: 5 }, backgroundColorStyle]}
+                            inputStyle={[{ paddingVertical: 2, borderColor: '#707070', fontSize: 16, marginLeft: 5 }, backgroundColorStyle]}
                             iconColor='#707070' />
                         <Panel2 style={styles.panelStyle} thumbShape='ring' reverseVerticalChannel />
                         <BrightnessSlider style={styles.sliderStyle} />
