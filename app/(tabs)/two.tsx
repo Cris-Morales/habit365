@@ -90,10 +90,11 @@ export default function TabTwoScreen() {
           </View>
           <View style={styles.divider} />
           <TouchableOpacity style={[styles.submitButton, { backgroundColor: canSubmit ? '#4fa8cc' : 'gray' }]} onPress={() => handleSubmit()} accessibilityLabel='Create your new habit.'
-            activeOpacity={0.85}>
+            activeOpacity={canSubmit ? 0.85 : 1.0}>
             <Text>Create Habit</Text>
           </TouchableOpacity>
-          {showValues ? <Text>{selectedColor.value}, {habitName}, {startDate?.toLocaleDateString()}, {intention}, {skipDays.toString()}, {selectedRoutine}</Text> : null}
+          {/* {showValues ? <Text>{selectedColor.value}, {habitName}, {startDate?.toLocaleDateString()}, {intention}, {skipDays.toString()}, {selectedRoutine}</Text> : null} */}
+          {/* feedback for testing */}
         </ScrollView>
       </KeyboardAvoidingView>
     </GestureHandlerRootView >
