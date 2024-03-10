@@ -1,5 +1,5 @@
-import { StyleSheet, Pressable, FlatList, Button, TextInput, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
-import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
+import { StyleSheet, FlatList, TextInput, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
+import { GestureHandlerRootView, ScrollView, Switch } from 'react-native-gesture-handler';
 import { useState } from 'react';
 import { Text, View } from '@/components/Themed';
 import AppColorPicker from '@/components/AppColorPicker';
@@ -14,41 +14,71 @@ const dummyData: string[] = ['N/A', 'Daily', 'Post-Morning Coffee Dookie Sit-dow
 
 
 export default function TabTwoScreen() {
+  const [isEnabled, setIsEnabled] = useState(false); // false - habit, true - routine
   const [habitName, setHabitName] = useState<string | undefined>();
-  const [startDate, setStartDate] = useState<Date | undefined>(new Date()) // DATE -  passed to database in UTC format YYYY-MM-DD, or whatever I feel like
+  const [routineName, setroutineName] = useState<string | undefined>();
+  const [startDate, setStartDate] = useState<Date | undefined>(new Date()) // DATE -  passed to database in UTC format YYYY-MM-DD,
   const [selectedRoutine, setSelectedRoutine] = useState<string>('');
   const [skipDays, setSkipDays] = useState<boolean[]>(Array(7).fill(true));
-  const [showValues, setShowValues] = useState<boolean>(false);
   const [intention, setIntention] = useState<string>('');
   const [canSubmit, setCanSubmit] = useState<boolean>(false);
   const selectedColor = useSharedValue('#75faff');
   const backgroundColorStyle = useAnimatedStyle(() => ({ backgroundColor: selectedColor.value }));
 
+  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
   const handleSubmit = () => {
     // submit selected state with a fetch
     // display loading feedback
     // switch to journal page, which should fetch an updated list
+    // !isEnabled ? habit : routine
     if (canSubmit) {
-      setShowValues(!showValues);
     }
   }
 
   return (
     <GestureHandlerRootView style={styles.createHabitContainer}>
       <KeyboardAvoidingView style={styles.createHabitContainer} behavior='height' keyboardVerticalOffset={100}>
-        <ScrollView style={styles.createHabitContainer}>
-          <View style={styles.formContainer}>
-            <Text style={styles.formTitle}>Habit Name</Text>
-            <TextInput style={styles.textInputForm} maxLength={28} placeholderTextColor={'white'} placeholder='ex. Meditation' onChangeText={(text) => {
-              if (text.length) {
-                setCanSubmit(true);
-                setHabitName(text);
-              } else {
-                setCanSubmit(false);
-                setHabitName(text);
-              }
-            }} />
+        <View style={styles.switchContainer}>
+          <View style={[styles.switchTitleContainer, { backgroundColor: !isEnabled ? '#4fa8cc' : 'gray' }]}>
+            <Text style={styles.switchTitle}>Habit</Text>
           </View>
+          <Switch
+            style={styles.switch}
+            trackColor={{ false: 'white', true: 'white' }}
+            thumbColor={isEnabled ? '#e17c30' : '#4fa8cc'}
+            onValueChange={toggleSwitch}
+            value={isEnabled}
+          />
+          <View style={[styles.switchTitleContainer, { backgroundColor: isEnabled ? '#e17c30' : 'gray' }]}>
+            <Text style={styles.switchTitle}>Routine</Text>
+          </View>
+        </View>
+        <ScrollView style={styles.createHabitContainer}>
+          {isEnabled ?
+            <View style={styles.formContainer}>
+              <Text style={styles.formTitle}>Routine Name</Text>
+              <TextInput style={styles.textInputForm} maxLength={40} placeholderTextColor={'white'} placeholder='ex. Morning Routine' onChangeText={(text) => {
+                if (text.length) {
+                  setCanSubmit(true);
+                  setroutineName(text);
+                } else {
+                  setCanSubmit(false);
+                  setroutineName(text);
+                }
+              }} />
+            </View>
+            : <View style={styles.formContainer}>
+              <Text style={styles.formTitle}>Habit Name</Text>
+              <TextInput style={styles.textInputForm} maxLength={28} placeholderTextColor={'white'} placeholder='ex. Meditation' onChangeText={(text) => {
+                if (text.length) {
+                  setCanSubmit(true);
+                  setHabitName(text);
+                } else {
+                  setCanSubmit(false);
+                  setHabitName(text);
+                }
+              }} />
+            </View>}
           <View style={styles.divider} />
           <View style={[styles.formContainer,]}>
             <Text style={styles.formTitle}>Start Date</Text>
@@ -65,7 +95,7 @@ export default function TabTwoScreen() {
                 keyExtractor={(item, index) => item + index}
                 renderItem={({ item, index }) => {
                   return (
-                    <DayButton index={index} day={item} skipDays={skipDays} setSkipDays={setSkipDays} color={'#4fa8cc'} />
+                    <DayButton index={index} day={item} skipDays={skipDays} setSkipDays={setSkipDays} color={isEnabled ? '#e17c30' : '#4fa8cc'} />
                   )
                 }}
               />
@@ -82,7 +112,7 @@ export default function TabTwoScreen() {
             <TextInput style={styles.textInputForm} placeholderTextColor={'white'} placeholder='ex. To Embrace Mindfulness' onChangeText={setIntention} />
           </View>
           <View style={styles.divider} />
-          <View style={styles.formContainer}>
+          {!isEnabled && <View style={styles.formContainer}>
             <Text style={styles.formTitle}>Add to Routine (Optional)</Text>
             <Picker
               style={[styles.textInputForm, { marginBottom: 15 }]}
@@ -90,14 +120,12 @@ export default function TabTwoScreen() {
               onValueChange={(itemValue, itemIndex) => setSelectedRoutine(itemValue)}>
               {dummyData.map((routine, index) => <Picker.Item key={routine + '-' + index} label={routine} value={routine} />)}
             </Picker>
-          </View>
-          <View style={styles.divider} />
-          <TouchableOpacity style={[styles.submitButton, { backgroundColor: canSubmit ? '#4fa8cc' : 'gray' }]} onPress={() => handleSubmit()} accessibilityLabel='Create your new habit.'
+          </View>}
+          {!isEnabled && <View style={styles.divider} />}
+          <TouchableOpacity style={[styles.submitButton, { backgroundColor: canSubmit ? (isEnabled ? '#e17c30' : '#4fa8cc') : 'gray' }]} onPress={() => handleSubmit()} accessibilityLabel='Create your new habit.'
             activeOpacity={canSubmit ? 0.85 : 1.0}>
-            <Text>Create Habit</Text>
+            <Text>{!isEnabled ? 'Create Habit' : 'Create Routine'}</Text>
           </TouchableOpacity>
-          {/* {showValues ? <Text>{selectedColor.value}, {habitName}, {startDate?.toLocaleDateString()}, {intention}, {skipDays.toString()}, {selectedRoutine}</Text> : null} */}
-          {/* feedback for testing */}
         </ScrollView>
       </KeyboardAvoidingView>
     </GestureHandlerRootView >
@@ -110,9 +138,29 @@ const styles = StyleSheet.create({
     flex: 1,
     alignContent: 'center',
   },
+  switchContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#373737',
+  },
+  switchTitleContainer: {
+    margin: 10,
+    justifyContent: 'center',
+    borderRadius: 10,
+    padding: 5,
+    width: '30%',
+  },
+  switchTitle: {
+    textAlign: 'center',
+    fontSize: 20,
+  },
+  switch: {
+  },
   formTitle: {
     marginBottom: 10,
     fontSize: 16,
+    textAlignVertical: 'center'
   },
   formContainer: {
     marginVertical: 10,

@@ -15,7 +15,7 @@ export default function AppColorPicker({ selectedColor, backgroundColorStyle }: 
 
     return (
         <Animated.View style={styles.container}>
-            <KeyboardAvoidingView behavior='position'>
+            <KeyboardAvoidingView behavior='height' >
                 <View style={styles.pickerContainer} >
                     <ColorPicker
                         value={selectedColor.value}

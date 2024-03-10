@@ -1,6 +1,7 @@
 import React from 'react';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import { View } from '@/components/Themed';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
@@ -42,14 +43,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="two"
         options={{
-          title: 'Add Habit',
-          tabBarIcon: ({ color }) => <IITabBarIcon name="add-circle-sharp" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="three"
-        options={{
-          title: 'Add Routine',
+          title: 'Create',
           tabBarIcon: ({ color }) => <IITabBarIcon name="add-circle-sharp" color={color} />,
         }}
       />
