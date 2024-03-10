@@ -5,7 +5,7 @@ import AppColorPicker from '@/components/AppColorPicker';
 
 
 
-export default function TabTwoScreen() {
+export default function TabThreeScreen() {
 
     return (
         <View style={{

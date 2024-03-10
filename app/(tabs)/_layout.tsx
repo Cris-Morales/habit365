@@ -48,7 +48,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="four"
+        name="three"
         options={{
           title: 'Settings',
           tabBarIcon: ({ color }) => <IITabBarIcon name="settings-sharp" color={color} />,
