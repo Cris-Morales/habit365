@@ -16,65 +16,68 @@ export default function TabTwoScreen() {
   const [showValues, setShowValues] = useState<boolean>(false);
   const selectedColor = useSharedValue('#75faff');
   const backgroundColorStyle = useAnimatedStyle(() => ({ backgroundColor: selectedColor.value }));
-  const [scroll, setScroll] = useState<boolean>(true);
+  const [keyboardOffset, setKeyboardOffset] = useState<boolean>(false);
 
 
 
   return (
     <GestureHandlerRootView style={styles.createHabitContainer}>
-      <ScrollView style={styles.createHabitContainer}>
-        <View style={styles.formContainer}>
-          <Text style={styles.formTitle}>Habit Name</Text>
-          <TextInput style={styles.textInputForm} maxLength={28} placeholderTextColor={'white'} placeholder='ex. Meditation' onChangeText={setHabitName} />
-        </View>
-        <View style={styles.divider} />
-        <View style={[styles.formContainer,]}>
-          <Text style={styles.formTitle}>Start Date</Text>
-          <AppDatePicker date={startDate} setDate={setStartDate} weekdays={weekdays} />
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.formContainer}>
-          <Text style={styles.formTitle}>Frequency:</Text>
-          <View style={{ alignContent: 'center', justifyContent: 'center', alignItems: 'center' }}>
-            <FlatList
-              horizontal={true}
-              scrollEnabled={false}
-              data={weekdays}
-              keyExtractor={(item, index) => item + index}
-              renderItem={({ item, index }) => {
-                return (
-                  <DayButton index={index} day={item} skipDays={skipDays} setSkipDays={setSkipDays} />
-                )
-              }}
-            />
+      <KeyboardAvoidingView style={styles.createHabitContainer} behavior='height' keyboardVerticalOffset={100}>
+        <ScrollView style={styles.createHabitContainer}>
+          <View style={styles.formContainer}>
+            <Text style={styles.formTitle}>Habit Name</Text>
+            <TextInput style={styles.textInputForm} maxLength={28} placeholderTextColor={'white'} placeholder='ex. Meditation' onChangeText={setHabitName} />
           </View>
-        </View >
-        <View style={styles.divider} />
-        <View style={styles.formContainer}>
-          <Text style={styles.formTitle}>Customize Color</Text>
-          <AppColorPicker selectedColor={selectedColor} backgroundColorStyle={backgroundColorStyle} />
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.formContainer}>
-          <Text style={styles.formTitle}>Intention (Optional)</Text>
-          <TextInput style={styles.textInputForm} placeholderTextColor={'white'} placeholder='ex. To Embrace Mindfulness' onChangeText={setHabitName} />
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.formContainer}>
-          <Text style={styles.formTitle}>Add to Routine (Optional)</Text>
-          <Pressable>
-            <Text>
-              Drop Down Menu Here
-            </Text>
-          </Pressable>
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.submitButton} >
-          <Button onPress={() => setShowValues(!showValues)} title='Create Habit' accessibilityLabel='Create your new habit.'></Button>
-        </View>
-        {showValues ? <Text>{selectedColor.value}, {habitName}, {startDate?.toLocaleDateString()}, , {skipDays.toString()}</Text> : null}
-      </ScrollView>
-    </GestureHandlerRootView>
+          <View style={styles.divider} />
+          <View style={[styles.formContainer,]}>
+            <Text style={styles.formTitle}>Start Date</Text>
+            <AppDatePicker date={startDate} setDate={setStartDate} weekdays={weekdays} />
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.formContainer}>
+            <Text style={styles.formTitle}>Frequency:</Text>
+            <View style={{ alignContent: 'center', justifyContent: 'center', alignItems: 'center' }}>
+              <FlatList
+                horizontal={true}
+                scrollEnabled={false}
+                data={weekdays}
+                keyExtractor={(item, index) => item + index}
+                renderItem={({ item, index }) => {
+                  return (
+                    <DayButton index={index} day={item} skipDays={skipDays} setSkipDays={setSkipDays} />
+                  )
+                }}
+              />
+            </View>
+          </View >
+          <View style={styles.divider} />
+          <View style={styles.formContainer}>
+            <Text style={styles.formTitle}>Customize Color</Text>
+            <AppColorPicker selectedColor={selectedColor} backgroundColorStyle={backgroundColorStyle} />
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.formContainer}>
+            <Text style={styles.formTitle}>Intention (Optional)</Text>
+            <TextInput style={styles.textInputForm} placeholderTextColor={'white'} placeholder='ex. To Embrace Mindfulness' onChangeText={setHabitName} />
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.formContainer}>
+            <Text style={styles.formTitle}>Add to Routine (Optional)</Text>
+            <Pressable>
+              <Text>
+                Drop Down Menu Here
+              </Text>
+            </Pressable>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.submitButton} >
+            <Button onPress={() => setShowValues(!showValues)} title='Create Habit' accessibilityLabel='Create your new habit.'></Button>
+          </View>
+          {showValues ? <Text>{selectedColor.value}, {habitName}, {startDate?.toLocaleDateString()}, , {skipDays.toString()}</Text> : null}
+        </ScrollView>
+      </KeyboardAvoidingView>
+
+    </GestureHandlerRootView >
   );
 }
 
@@ -95,7 +98,7 @@ const styles = StyleSheet.create({
   },
   createHabitContainer: {
     flex: 1,
-    alignContent: 'center'
+    alignContent: 'center',
   },
   formTitle: {
     marginBottom: 10,
@@ -129,6 +132,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'gray'
+    borderColor: 'gray',
   }
 });
