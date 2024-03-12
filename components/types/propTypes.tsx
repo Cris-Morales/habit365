@@ -4,7 +4,11 @@ export interface routine {
     current_streak: number;
     total_days: number;
     date_diff: number;
-    id: number
+    id: number;
+    start_date: string;
+    created_at: string;
+    longest_streak: number;
+    intention: string | undefined;
 }
 export interface habit {
     title: string;
@@ -12,7 +16,11 @@ export interface habit {
     current_streak: number;
     total_days: number;
     date_diff: number;
-    id: number
+    id: number;
+    start_date: string;
+    created_at: string;
+    longest_streak: number;
+    intention: string | undefined;
 }
 
 export interface dataShape {

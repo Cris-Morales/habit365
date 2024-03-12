@@ -7,21 +7,6 @@ import RoutineComponent from '@/components/RoutineComponent';
 
 export default function TabOneScreen() {
 
-  const routineLists = (item: any) => {
-    return (
-      <View>
-        <HabitRow habitData={item.routine_data} />
-        <FlatList
-          scrollEnabled={true}
-          data={item.routine_habits}
-          keyExtractor={(item) => item.title}
-          renderItem={({ item }) => {
-            return (<HabitRow habitData={item} />)
-          }}
-        />
-      </View>
-    )
-  }
   return (
     <View style={styles.container}>
       <FlatList

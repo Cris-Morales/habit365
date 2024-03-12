@@ -23,7 +23,7 @@ export default function RoutineDetails() {
         <View style={styles.container}>
             <Text style={styles.title}>{params.title}</Text>
             <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-            <Text>Best 100% Streak</Text>
+            <Text>aw hell yeah</Text>
             <Text>Average Completion</Text>
             <Text>Edit Routine</Text>
             <Text>Delete Routine (Red)</Text>

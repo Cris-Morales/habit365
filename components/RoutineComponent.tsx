@@ -16,15 +16,17 @@ export default function RoutineComponent({ routine_data, routine_habits }: any) 
     const [routineProgress, setRoutineProgress] = useState<number>(0)
 
     return (
-        <View style={styles.routineContainer}>
-            <RoutineHeader routine_data={routine_data} routineProgress={routineProgress} routineLength={routine_habits.length} />
-            <View style={styles.habitRowContainer}>
+        <View style={[styles.routineContainer, routine_data.title != 'Undefined' && { borderWidth: 1, borderColor: 'gray' }]}>
+            {routine_data.title != 'Undefined' &&
+                <RoutineHeader routine_data={routine_data} routineProgress={routineProgress} routineLength={routine_habits.length} />
+            }
+            <View style={[styles.habitRowContainer, { marginVertical: 10 }]}>
                 <FlatList
                     scrollEnabled={true}
                     data={routine_habits}
                     keyExtractor={(item) => item.title}
                     renderItem={({ item }) => {
-                        return (<HabitRow habitData={item} setRoutineProgress={setRoutineProgress} routineProgress={routineProgress} />)
+                        return (<HabitRow habitData={item} setRoutineProgress={setRoutineProgress} routineProgress={routineProgress} routineTitle={routine_data.title} />)
                     }}
                 />
             </View>
@@ -35,8 +37,8 @@ export default function RoutineComponent({ routine_data, routine_habits }: any) 
 
 const styles = StyleSheet.create({
     routineContainer: {
-        borderWidth: 1,
-        borderColor: 'gray',
+        // borderWidth: 1,
+        // borderColor: 'gray',
         borderRadius: 16,
         paddingBottom: 2.5,
         flex: 1,

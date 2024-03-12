@@ -10,7 +10,7 @@ interface listData {
 }
 
 
-export default function HabitRow({ habitData, setRoutineProgress, routineProgress }: any) {
+export default function HabitRow({ habitData, setRoutineProgress, routineProgress, routineTitle }: any) {
     const [streak, setStreak] = useState<number>(habitData.current_streak)
     const [total, setTotal] = useState<number>(habitData.total_days)
     const [perHit, setPerHit] = useState<number>(Math.round(total / habitData.date_diff * 1000) / 10)
@@ -76,7 +76,7 @@ export default function HabitRow({ habitData, setRoutineProgress, routineProgres
     }
 
     return (
-        <View style={styles.habitView}>
+        <View style={[styles.habitView, routineTitle == 'Undefined' && { borderWidth: 1, borderColor: 'gray', marginTop: 10, height: 90 }]}>
             <Pressable onLongPress={openHabitModal} style={styles.modalButton}>
                 <View style={{
                     flex: 1,
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         borderRadius: 16,
-        paddingHorizontal: 5,
+        paddingHorizontal: 10,
         marginHorizontal: 5,
         marginVertical: 2.5,
         backgroundColor: '#1c1c1c'
