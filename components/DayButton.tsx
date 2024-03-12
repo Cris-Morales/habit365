@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 
 export default function DayButton({ index, day, skipDays, setSkipDays, color }: any) {
-    const [pressed, setPressed] = useState<boolean>(true);
+    const [pressed, setPressed] = useState<boolean>(skipDays[index]);
 
     const handlePress = () => {
         const eventValue: boolean = pressed ? false : true

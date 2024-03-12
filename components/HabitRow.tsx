@@ -37,7 +37,7 @@ export default function HabitRow({ habitData, setRoutineProgress, routineProgres
                 params: {
                     id: habitData.id,
                     title: habitData.title
-                }
+                },
             }
         )
     }

@@ -61,6 +61,14 @@ function RootLayoutNav() {
           title: 'Routine Details',
           presentation: 'modal'
         }} />
+        <Stack.Screen name="edit-routine" options={{
+          title: 'Edit Routine',
+          presentation: 'modal'
+        }} />
+        <Stack.Screen name="edit-habit" options={{
+          title: 'Edit Habit',
+          presentation: 'modal'
+        }} />
       </Stack>
     </ThemeProvider>
   );

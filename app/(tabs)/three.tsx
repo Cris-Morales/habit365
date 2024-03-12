@@ -11,13 +11,12 @@ export default function TabThreeScreen() {
         <View style={{
             flex: 1,
         }}>
-            <Text>Habit Name</Text>
-            <Text>Start Date</Text>
-            <Text>Intention (Optional)</Text>
-            <Text>Frequency: Everyday, Select Days</Text>
-            <Text>Add to Routine</Text>
-
-            <Text>Create Habit</Text>
+            <Text>Color Scheme</Text>
+            <Text>Set User Name</Text>
+            <Text>Toggle App Open Habit</Text>
+            <Text>Day/Night Mode</Text>
+            <Text>About this Project</Text>
+            <Text>Github</Text>
         </View>
     );
 }

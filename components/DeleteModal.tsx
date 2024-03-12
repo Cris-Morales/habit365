@@ -1,4 +1,4 @@
-import { Link, Redirect, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { View, Text } from "./Themed";
 import { StyleSheet, Pressable, Alert } from "react-native";
 import React from "react";

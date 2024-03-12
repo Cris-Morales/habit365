@@ -9,6 +9,7 @@ export interface routine {
     created_at: string;
     longest_streak: number;
     intention: string | undefined;
+    frequency: boolean[] | undefined;
 }
 export interface habit {
     title: string;
@@ -21,6 +22,7 @@ export interface habit {
     created_at: string;
     longest_streak: number;
     intention: string | undefined;
+    frequency: boolean[]
 }
 
 export interface dataShape {

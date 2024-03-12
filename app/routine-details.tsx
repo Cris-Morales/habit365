@@ -22,7 +22,7 @@ export default function RoutineDetails() {
     <View style={styles.container}>
       <View style={styles.titleContainer}>
         <View style={{ backgroundColor: RoutineDummyData.color, width: 60, height: 60, borderRadius: 30, marginRight: 10, marginLeft: -30 }} />
-        <Text style={styles.title}>{params.title}</Text>
+        <Text style={styles.title} >{params.title}</Text>
       </View>
       <View style={styles.separator} lightColor="#eee" darkColor="gray" />
       <View style={styles.statContainer}>
@@ -112,6 +112,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     alignSelf: 'center',
+    width: '50%'
   },
   subTitle: {
     marginBottom: 10,

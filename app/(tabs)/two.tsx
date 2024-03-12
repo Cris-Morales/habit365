@@ -7,6 +7,7 @@ import { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import DayButton from '@/components/DayButton';
 import AppDatePicker from '@/components/AppDatePicker';
 import { Picker } from '@react-native-picker/picker';
+import { router, useRouter } from 'expo-router';
 const weekdays: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 // import dummyData from '@/components/dummyData';
 
@@ -32,6 +33,11 @@ export default function TabTwoScreen() {
     // switch to journal page, which should fetch an updated list
     // !isEnabled ? habit : routine
     if (canSubmit) {
+      router.replace(
+        {
+          pathname: "/(tabs)/"
+        }
+      )
     }
   }
 
