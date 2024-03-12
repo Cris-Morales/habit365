@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { View, Text } from '@/components/Themed';
 import RoutineHeader from './RoutineHeader';
 import HabitRow from './HabitRow';
-import { dataShape } from './types/propTypes';
+import { dataShape } from './types/dataTypes';
 
 export default function RoutineComponent({ routine_data, routine_habits }: any) {
 

@@ -54,11 +54,11 @@ function RootLayoutNav() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false, navigationBarHidden: false }} />
         <Stack.Screen name="habit-details" options={{
-          title: 'Habit Options',
+          title: 'Habit Details',
           presentation: 'modal'
         }} />
         <Stack.Screen name="routine-details" options={{
-          title: 'Routine Options',
+          title: 'Routine Details',
           presentation: 'modal'
         }} />
       </Stack>

@@ -1,4 +1,4 @@
-import { dataShape } from "./types/propTypes"
+import { dataShape } from "./types/dataTypes"
 
 const dummyData: dataShape[] = [
     {
