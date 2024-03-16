@@ -6,6 +6,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { useColorScheme } from '@/components/useColorScheme';
 import { Text } from '@/components/Themed';
+import { Platform } from 'react-native';
+import * as SQLite from "expo-sqlite";
 
 
 export {
@@ -44,6 +46,8 @@ export default function RootLayout() {
 
   return <RootLayoutNav />;
 }
+
+
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();

@@ -8,6 +8,7 @@ import DayButton from '@/components/DayButton';
 import AppDatePicker from '@/components/AppDatePicker';
 import { Picker } from '@react-native-picker/picker';
 import { router, useRouter } from 'expo-router';
+import dbInsert from '@/utils/dbInsertQueries';
 const weekdays: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 // import dummyData from '@/components/dummyData';
 
@@ -26,21 +27,33 @@ export default function TabTwoScreen() {
   const selectedColor = useSharedValue('#75faff');
   const backgroundColorStyle = useAnimatedStyle(() => ({ backgroundColor: selectedColor.value }));
 
-  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
-  const handleSubmit = () => {
-    // submit selected state with a fetch
-    // display loading feedback
-    // switch to journal page, which should fetch an updated list
-    // !isEnabled ? habit : routine
+  const toggleSwitch = () => {
+    setIsEnabled(previousState => !previousState)
+    setCanSubmit(false);
+  };
+  const handleSubmit = (action: string) => {
     if (canSubmit) {
-      router.replace(
-        {
-          pathname: "/(tabs)/"
-        }
-      )
+      if (action === 'routine') {
+        dbInsert.routine(routineName, startDate?.toISOString().split('T')[0], selectedColor.value, intention);
+        router.replace(
+          {
+            pathname: "/(tabs)/three"
+          }
+        )
+      } else if (action === 'habit') {
+        dbInsert.habit(habitName, startDate?.toISOString().split('T')[0], selectedColor.value, intention);
+        // reset state
+        // is loading
+        router.replace(
+          {
+            pathname: "/(tabs)/three"
+          }
+        )
+      }
+    } else {
+      console.error('Cannot submit without a Name')
     }
   }
-
   return (
     <GestureHandlerRootView style={styles.createHabitContainer}>
       <KeyboardAvoidingView style={styles.createHabitContainer} behavior='height' keyboardVerticalOffset={100}>
@@ -69,11 +82,12 @@ export default function TabTwoScreen() {
                   setroutineName(text);
                 } else {
                   setCanSubmit(false);
-                  setroutineName(text);
+                  setroutineName(undefined);
                 }
               }} />
             </View>
-            : <View style={styles.formContainer}>
+            :
+            <View style={styles.formContainer}>
               <Text style={styles.formTitle}>Habit Name</Text>
               <TextInput style={styles.textInputForm} maxLength={28} placeholderTextColor={'white'} placeholder='ex. Meditation' onChangeText={(text) => {
                 if (text.length) {
@@ -81,32 +95,35 @@ export default function TabTwoScreen() {
                   setHabitName(text);
                 } else {
                   setCanSubmit(false);
-                  setHabitName(text);
+                  setHabitName(undefined);
                 }
               }} />
-            </View>}
+            </View>
+          }
           <View style={styles.divider} />
           <View style={[styles.formContainer,]}>
             <Text style={styles.formTitle}>Start Date</Text>
             <AppDatePicker date={startDate} setDate={setStartDate} weekdays={weekdays} />
           </View>
-          <View style={styles.divider} />
-          <View style={styles.formContainer}>
-            <Text style={styles.formTitle}>Frequency:</Text>
-            <View style={{ alignContent: 'center', justifyContent: 'center', alignItems: 'center' }}>
-              <FlatList
-                horizontal={true}
-                scrollEnabled={false}
-                data={weekdays}
-                keyExtractor={(item, index) => item + index}
-                renderItem={({ item, index }) => {
-                  return (
-                    <DayButton index={index} day={item} skipDays={skipDays} setSkipDays={setSkipDays} color={isEnabled ? '#e17c30' : '#4fa8cc'} />
-                  )
-                }}
-              />
-            </View>
-          </View >
+          {!isEnabled ? <>
+            <View style={styles.divider} />
+            <View style={styles.formContainer}>
+              <Text style={styles.formTitle}>Frequency:</Text>
+              <View style={{ alignContent: 'center', justifyContent: 'center', alignItems: 'center' }}>
+                <FlatList
+                  horizontal={true}
+                  scrollEnabled={false}
+                  data={weekdays}
+                  keyExtractor={(item, index) => item + index}
+                  renderItem={({ item, index }) => {
+                    return (
+                      <DayButton index={index} day={item} skipDays={skipDays} setSkipDays={setSkipDays} color={isEnabled ? '#e17c30' : '#4fa8cc'} />
+                    )
+                  }}
+                />
+              </View>
+            </View >
+          </> : null}
           <View style={styles.divider} />
           <View style={styles.formContainer}>
             <Text style={styles.formTitle}>Customize Color</Text>
@@ -128,7 +145,7 @@ export default function TabTwoScreen() {
             </Picker>
           </View>}
           {!isEnabled && <View style={styles.divider} />}
-          <TouchableOpacity style={[styles.submitButton, { backgroundColor: canSubmit ? (isEnabled ? '#e17c30' : '#4fa8cc') : 'gray' }]} onPress={() => handleSubmit()} accessibilityLabel='Create your new habit.'
+          <TouchableOpacity style={[styles.submitButton, { backgroundColor: canSubmit ? (isEnabled ? '#e17c30' : '#4fa8cc') : 'gray' }]} onPress={() => handleSubmit(isEnabled ? 'routine' : 'habit')} accessibilityLabel='Create your new habit.'
             activeOpacity={canSubmit ? 0.85 : 1.0}>
             <Text>{!isEnabled ? 'Create Habit' : 'Create Routine'}</Text>
           </TouchableOpacity>

@@ -3,7 +3,7 @@ import { View } from '@/components/Themed';
 import HabitRow from '@/components/HabitRow';
 import dummyData from '@/components/dummyData';
 import RoutineComponent from '@/components/RoutineComponent';
-
+import openDatabase from '@/utils/dbInit';
 
 export default function TabOneScreen() {
 

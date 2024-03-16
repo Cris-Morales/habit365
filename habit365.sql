@@ -1,5 +1,5 @@
 
-CREATE TABLE habits {
+CREATE TABLE habits (
   id integer [primary key],
   title varchar(28) NOT NULL,
   color varchar(16) NOT NULL,
@@ -9,4 +9,4 @@ CREATE TABLE habits {
   longest_streak integer DEFAULT 0 NOT NULL,
   created_at timestamp NOT NULL,
   intention varchar(255),
-};
+);
