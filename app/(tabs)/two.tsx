@@ -8,7 +8,7 @@ import DayButton from '@/components/DayButton';
 import AppDatePicker from '@/components/AppDatePicker';
 import { Picker } from '@react-native-picker/picker';
 import { router, useRouter } from 'expo-router';
-import dbInsert from '@/utils/dbInsertQueries';
+import * as SQLite from 'expo-sqlite';
 const weekdays: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 // import dummyData from '@/components/dummyData';
 
@@ -31,28 +31,25 @@ export default function TabTwoScreen() {
     setIsEnabled(previousState => !previousState)
     setCanSubmit(false);
   };
+
   const handleSubmit = (action: string) => {
-    if (canSubmit) {
-      if (action === 'routine') {
-        dbInsert.routine(routineName, startDate?.toISOString().split('T')[0], selectedColor.value, intention);
+    try {
+      if (canSubmit) {
+        if (action === 'routine') {
+        } else if (action === 'habit') {
+        }
         router.replace(
           {
             pathname: "/(tabs)/three"
           }
         )
-      } else if (action === 'habit') {
-        dbInsert.habit(habitName, startDate?.toISOString().split('T')[0], selectedColor.value, intention);
-        // reset state
-        // is loading
-        router.replace(
-          {
-            pathname: "/(tabs)/three"
-          }
-        )
+      } else {
+        console.error('Cannot submit without a Name');
       }
-    } else {
-      console.error('Cannot submit without a Name')
+    } catch (error) {
+      console.error(error);
     }
+
   }
   return (
     <GestureHandlerRootView style={styles.createHabitContainer}>

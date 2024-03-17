@@ -1,5 +1,5 @@
 import { StyleSheet, Button, } from 'react-native';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Text, View } from '@/components/Themed';
 import * as SQLite from 'expo-sqlite';
 
@@ -15,11 +15,14 @@ interface habitRow {
     title: string;
 }
 
+let db = SQLite.openDatabase('habit365.db');
 export default function TabThreeScreen() {
     const [data, setData] = useState<habitRow[] | undefined>();
 
-
-    const db = SQLite.openDatabase('habit365');
+    const openDatabase = function () {
+        db = SQLite.openDatabase('habit365.db');
+        console.log('database re-open')
+    }
 
     const createTable = function () {
         db.transaction(tx => {
@@ -40,8 +43,6 @@ export default function TabThreeScreen() {
                     console.error("Error creating table:", error);
                 }
             );
-        });
-        db.transaction(tx => {
             tx.executeSql(
                 `
                     CREATE TABLE IF NOT EXISTS habits (
@@ -67,18 +68,47 @@ export default function TabThreeScreen() {
         });
     }
 
-    const insertHabit = function () {
-        db.transaction(tx => {
-            tx.executeSql(
-                `INSERT INTO routines (title, start_date, color) VALUES (?, ?, ?)`, ['Testing', '2023-01-01', '#00ff00'],
-                (_, resultSet) => {
-                    console.log("insert successfully", resultSet);
-                },
-                (_, error): any => {
-                    console.error("Error in insert:", error);
-                }
-            );
-        });
+    const insertHabitAsync = async function () {
+        const query: string = 'INSERT INTO habits (title, start_date, color, intention) VALUES (?, ?, ?, ?)';
+
+        const params: any[] = ['TestingHabits', '2023-01-01', '#00ff00', 'intentionHabit'];
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    query,
+                    params,
+                    (tx, result) => resolve(result),
+                    (_, error): any => reject(error)
+                )
+            })
+        })
+    };
+    const insertHabit = async function () {
+        try {
+            const resultSet = await db.transactionAsync(async tx => {
+                await tx.executeSqlAsync(
+                    `INSERT INTO habits (title, start_date, color, intention) VALUES (?, ?, ?, ?)`, ['TestingHabit', '2023-01-01', '#00ff00', 'intentionHabit'],
+                );
+            });
+            console.log('result check: ', resultSet)
+        } catch (error) {
+            console.error(error);
+        }
+
+    };
+
+    const insertRoutine = async function () {
+        try {
+            const resultSet = await db.transactionAsync(async tx => {
+                await tx.executeSqlAsync(
+                    `INSERT INTO routines (title, start_date, color, intention) VALUES (?, ?, ?, ?)`, ['TestingRoutine', '2023-01-01', '#00ff00', 'intentionHabit'],
+                );
+            });
+            console.log('result check: ', resultSet)
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const closeAndDrop = async function () {
@@ -93,11 +123,21 @@ export default function TabThreeScreen() {
 
     const readHabit = function () {
         db.transaction(tx => {
-            tx.executeSql('SELECT * FROM routines', [], (_, { rows }) => {
+            tx.executeSql('SELECT * FROM habits', [], (_, { rows }) => {
                 const habitData = (rows._array);
-                console.log(rows._array);
+                console.log('read habits successfully', rows._array);
                 setData(habitData);
             }, (_, error): any => console.error('Error in read habit: ', error),
+            )
+        })
+    };
+    const readRoutine = function () {
+        db.transaction(tx => {
+            tx.executeSql('SELECT * FROM routines', [], (_, { rows }) => {
+                const habitData = (rows._array);
+                console.log('read routines successfully', rows._array);
+                setData(habitData);
+            }, (_, error): any => console.error('Error in read routines: ', error),
             )
         })
     };
@@ -112,10 +152,15 @@ export default function TabThreeScreen() {
             <Text>Day/Night Mode</Text>
             <Text>About this Project</Text>
             <Text>Github</Text>
+            <Button onPress={openDatabase} title='re-open' />
             <Button onPress={createTable} title='create table' />
-            <Button onPress={insertHabit} title='insert data' />
-            <Button onPress={readHabit} title='read routine' />
+            <Button onPress={insertHabitAsync} title='insert habit async' />
+            <Button onPress={insertHabit} title='insert habit' />
+            <Button onPress={readHabit} title='read habit' />
+            <Button onPress={insertRoutine} title='insert routine' />
+            <Button onPress={readRoutine} title='read routine' />
             <Button onPress={closeAndDrop} title='close and drop database' />
+
             {data?.map((element, index) => <Text key={element.title + element.created_at}>{element.title}, {element.color}, {element.start_date}, {element.created_at}, {element.intention}</Text>)}
         </View>
     );
