@@ -13,8 +13,7 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
-    "utils/dbExample.js",
     "app/(tabs)/three.tsx",
-    "utils/dbInsertQueries.ts"
+    "utils/tabTwoQueries.ts"
   ]
 }

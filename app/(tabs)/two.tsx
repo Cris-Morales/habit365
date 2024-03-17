@@ -1,6 +1,6 @@
 import { StyleSheet, FlatList, TextInput, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
 import { GestureHandlerRootView, ScrollView, Switch } from 'react-native-gesture-handler';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Text, View } from '@/components/Themed';
 import AppColorPicker from '@/components/AppColorPicker';
 import { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
@@ -8,9 +8,10 @@ import DayButton from '@/components/DayButton';
 import AppDatePicker from '@/components/AppDatePicker';
 import { Picker } from '@react-native-picker/picker';
 import { router, useRouter } from 'expo-router';
-import * as SQLite from 'expo-sqlite';
+import * as SQLite from 'expo-sqlite/next';
+import tabTwoQueries from '@/utils/tabTwoQueries';
+
 const weekdays: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-// import dummyData from '@/components/dummyData';
 
 const dummyData: string[] = ['N/A', 'Daily', 'Post-Morning Coffee Dookie Sit-down', 'Evening']
 
@@ -24,32 +25,49 @@ export default function TabTwoScreen() {
   const [skipDays, setSkipDays] = useState<boolean[]>(Array(7).fill(true));
   const [intention, setIntention] = useState<string>('');
   const [canSubmit, setCanSubmit] = useState<boolean>(false);
+  const [routineList, setRoutineList] = useState<any>([]);
   const selectedColor = useSharedValue('#75faff');
   const backgroundColorStyle = useAnimatedStyle(() => ({ backgroundColor: selectedColor.value }));
+
+  useEffect(() => {
+    const queryRoutineList = async () => {
+      try {
+        const routineListResults = await tabTwoQueries.getRoutineList();
+        console.log('query success');
+        setRoutineList(routineListResults);
+      } catch (error) {
+        console.error('Error in routine list query: ', error)
+      }
+    }
+    queryRoutineList();
+  }, [])
+
 
   const toggleSwitch = () => {
     setIsEnabled(previousState => !previousState)
     setCanSubmit(false);
   };
 
-  const handleSubmit = (action: string) => {
-    try {
-      if (canSubmit) {
+  const handleSubmit = async (action: string) => {
+    if (canSubmit) {
+      try {
         if (action === 'routine') {
+          await tabTwoQueries.insertRoutine(routineName, startDate?.toISOString().split('T')[0], selectedColor.value, intention);
         } else if (action === 'habit') {
+          await tabTwoQueries.insertHabit(habitName, startDate?.toISOString().split('T')[0], selectedColor.value, intention);
         }
         router.replace(
           {
             pathname: "/(tabs)/three"
           }
         )
-      } else {
-        console.error('Cannot submit without a Name');
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
-    }
 
+    } else {
+      console.error('Cannot submit without a Name');
+    }
   }
   return (
     <GestureHandlerRootView style={styles.createHabitContainer}>
@@ -137,8 +155,10 @@ export default function TabTwoScreen() {
             <Picker
               style={[styles.textInputForm, { marginBottom: 15 }]}
               selectedValue={selectedRoutine}
-              onValueChange={(itemValue, itemIndex) => setSelectedRoutine(itemValue)}>
-              {dummyData.map((routine, index) => <Picker.Item key={routine + '-' + index} label={routine} value={routine} />)}
+              onValueChange={(itemValue) => {
+                setSelectedRoutine(itemValue)
+              }}>
+              {routineList.map((routineData: any, index: number) => <Picker.Item key={routineData + '-' + index} label={routineData.title} value={routineData.title} />)}
             </Picker>
           </View>}
           {!isEnabled && <View style={styles.divider} />}
