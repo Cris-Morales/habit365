@@ -22,25 +22,25 @@ export default function TabTwoScreen() {
   const [routineName, setroutineName] = useState<string | undefined>();
   const [startDate, setStartDate] = useState<Date | undefined>(new Date()) // DATE -  passed to database in UTC format YYYY-MM-DD,
   const [selectedRoutine, setSelectedRoutine] = useState<string>('');
-  const [skipDays, setSkipDays] = useState<boolean[]>(Array(7).fill(true));
+  const [frequency, setFrequency] = useState<boolean[]>(Array(7).fill(true));
   const [intention, setIntention] = useState<string>('');
   const [canSubmit, setCanSubmit] = useState<boolean>(false);
   const [routineList, setRoutineList] = useState<any>([]);
   const selectedColor = useSharedValue('#75faff');
   const backgroundColorStyle = useAnimatedStyle(() => ({ backgroundColor: selectedColor.value }));
 
-  useEffect(() => {
-    const queryRoutineList = async () => {
-      try {
-        const routineListResults = await tabTwoQueries.getRoutineList();
-        console.log('query success');
-        setRoutineList(routineListResults);
-      } catch (error) {
-        console.error('Error in routine list query: ', error)
-      }
-    }
-    queryRoutineList();
-  }, [])
+  // useEffect(() => {
+  //   const queryRoutineList = async () => {
+  //     try {
+  //       const routineListResults = await tabTwoQueries.getRoutineList();
+  //       console.log('query success');
+  //       setRoutineList(routineListResults);
+  //     } catch (error) {
+  //       console.error('Error in routine list query: ', error)
+  //     }
+  //   }
+  //   queryRoutineList();
+  // }, [isEnabled])
 
 
   const toggleSwitch = () => {
@@ -54,7 +54,9 @@ export default function TabTwoScreen() {
         if (action === 'routine') {
           await tabTwoQueries.insertRoutine(routineName, startDate?.toISOString().split('T')[0], selectedColor.value, intention);
         } else if (action === 'habit') {
-          await tabTwoQueries.insertHabit(habitName, startDate?.toISOString().split('T')[0], selectedColor.value, intention);
+
+          const habit_id: number = await tabTwoQueries.insertHabit(habitName, startDate?.toISOString().split('T')[0], selectedColor.value, intention);
+          await tabTwoQueries.setFrequency(habit_id, frequency)
         }
         router.replace(
           {
@@ -132,7 +134,7 @@ export default function TabTwoScreen() {
                   keyExtractor={(item, index) => item + index}
                   renderItem={({ item, index }) => {
                     return (
-                      <DayButton index={index} day={item} skipDays={skipDays} setSkipDays={setSkipDays} color={isEnabled ? '#e17c30' : '#4fa8cc'} />
+                      <DayButton index={index} day={item} skipDays={frequency} setSkipDays={setFrequency} color={isEnabled ? '#e17c30' : '#4fa8cc'} />
                     )
                   }}
                 />
@@ -150,7 +152,7 @@ export default function TabTwoScreen() {
             <TextInput style={styles.textInputForm} placeholderTextColor={'white'} placeholder='ex. To Embrace Mindfulness' onChangeText={setIntention} />
           </View>
           <View style={styles.divider} />
-          {!isEnabled && <View style={styles.formContainer}>
+          {/* {!isEnabled && <View style={styles.formContainer}>
             <Text style={styles.formTitle}>Add to Routine (Optional)</Text>
             <Picker
               style={[styles.textInputForm, { marginBottom: 15 }]}
@@ -160,7 +162,7 @@ export default function TabTwoScreen() {
               }}>
               {routineList.map((routineData: any, index: number) => <Picker.Item key={routineData + '-' + index} label={routineData.title} value={routineData.title} />)}
             </Picker>
-          </View>}
+          </View>} */}
           {!isEnabled && <View style={styles.divider} />}
           <TouchableOpacity style={[styles.submitButton, { backgroundColor: canSubmit ? (isEnabled ? '#e17c30' : '#4fa8cc') : 'gray' }]} onPress={() => handleSubmit(isEnabled ? 'routine' : 'habit')} accessibilityLabel='Create your new habit.'
             activeOpacity={canSubmit ? 0.85 : 1.0}>
