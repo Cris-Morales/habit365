@@ -53,6 +53,11 @@ export default function TabThreeScreen() {
         }
     }
 
+    const resetDatabase = () => {
+        const db = SQLite.openDatabaseSync('habit365.db');
+        db.closeSync();
+    }
+
 
     return (
         <View style={{ flex: 1 }}>
@@ -71,7 +76,8 @@ export default function TabThreeScreen() {
             <Button onPress={readFrequencyTable} title='read habits_days_frequency table' />
             <Button onPress={() => readTable('habit_entries')} title='read habit_entries table' />
             <Button onPress={() => readTable('routine_entries')} title='read routine_entries table' />
-            <Button onPress={dropDatabase} title='drop database' />
+            <Button onPress={dropDatabase} title='delete database' />
+            <Button onPress={resetDatabase} title='reset database' />
         </View>
     );
 }

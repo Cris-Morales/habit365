@@ -55,7 +55,6 @@ const tabTwoQueries: any = {
             const db = await SQLite.openDatabaseAsync('habit365.db');
 
             const allRows = await db.getAllAsync('SELECT title, id FROM routines');
-            console.log('Routine Rows Queries: ', allRows);
             return allRows;
         } catch (error) {
             console.error('Error in Routine List Query: ', error);
