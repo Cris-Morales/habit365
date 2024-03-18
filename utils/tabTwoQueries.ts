@@ -2,10 +2,18 @@ import * as SQLite from 'expo-sqlite/next';
 
 
 const tabTwoQueries: any = {
-    insertHabit: async (title: string, start_date: string, color: string, intention: string) => {
+    insertHabit: async (title: string, start_date: string, color: string, intention: string, routine_id: number | undefined) => {
         try {
             const db = await SQLite.openDatabaseAsync('habit365.db');
+            // const results: any = await db.runAsync('INSERT INTO habits (title, start_date, color, intention) VALUES (?, ?, ?, ?)', title, start_date, color, intention);
             const results: any = await db.runAsync('INSERT INTO habits (title, start_date, color, intention) VALUES (?, ?, ?, ?)', title, start_date, color, intention);
+
+            console.log('Habit Inserted, checking routine_id...');
+
+            if (routine_id) {
+                console.log('updating routine_id: ', results.lastInsertRowId, routine_id);
+                await db.runAsync('UPDATE habits SET routine_id = ? WHERE id = ?;', routine_id, results.lastInsertRowId);
+            }
 
             console.log('Habit Inserted: ', results.lastInsertRowId, results.changes);
 

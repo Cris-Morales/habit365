@@ -8,18 +8,14 @@ import DayButton from '@/components/DayButton';
 import AppDatePicker from '@/components/AppDatePicker';
 import { Picker } from '@react-native-picker/picker';
 import { router, useRouter } from 'expo-router';
-import * as SQLite from 'expo-sqlite/next';
 import tabTwoQueries from '@/utils/tabTwoQueries';
 
 const weekdays: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-const dummyData: string[] = ['N/A', 'Daily', 'Post-Morning Coffee Dookie Sit-down', 'Evening']
-
-
 export default function TabTwoScreen() {
   const [isEnabled, setIsEnabled] = useState(false); // false - habit, true - routine
   const [habitName, setHabitName] = useState<string | undefined>();
-  const [routineName, setroutineName] = useState<string | undefined>();
+  const [routineName, setRoutineName] = useState<string | undefined>();
   const [startDate, setStartDate] = useState<Date | undefined>(new Date()) // DATE -  passed to database in UTC format YYYY-MM-DD,
   const [selectedRoutine, setSelectedRoutine] = useState<string>('');
   const [frequency, setFrequency] = useState<boolean[]>(Array(7).fill(true));
@@ -29,18 +25,22 @@ export default function TabTwoScreen() {
   const selectedColor = useSharedValue('#75faff');
   const backgroundColorStyle = useAnimatedStyle(() => ({ backgroundColor: selectedColor.value }));
 
-  // useEffect(() => {
-  //   const queryRoutineList = async () => {
-  //     try {
-  //       const routineListResults = await tabTwoQueries.getRoutineList();
-  //       console.log('query success');
-  //       setRoutineList(routineListResults);
-  //     } catch (error) {
-  //       console.error('Error in routine list query: ', error)
-  //     }
-  //   }
-  //   queryRoutineList();
-  // }, [isEnabled])
+  useEffect(() => {
+    const queryRoutineList = async () => {
+      try {
+        const routineListResults = await tabTwoQueries.getRoutineList();
+        console.log('query results: ', routineListResults);
+        if (routineListResults) {
+          setRoutineList(routineListResults);
+        } else {
+          setRoutineList([]);
+        }
+      } catch (error) {
+        console.error('Error in routine list query: ', error)
+      }
+    }
+    queryRoutineList();
+  }, [isEnabled])
 
 
   const toggleSwitch = () => {
@@ -48,16 +48,26 @@ export default function TabTwoScreen() {
     setCanSubmit(false);
   };
 
+  const resetForm = () => {
+    selectedColor.value = '#75faff';
+    setIsEnabled(false);
+    setHabitName(undefined);
+    setStartDate(new Date());
+    setFrequency(Array(7).fill(true));
+    setIntention('');
+    setCanSubmit(false);
+  }
+
   const handleSubmit = async (action: string) => {
     if (canSubmit) {
       try {
         if (action === 'routine') {
           await tabTwoQueries.insertRoutine(routineName, startDate?.toISOString().split('T')[0], selectedColor.value, intention);
         } else if (action === 'habit') {
-
-          const habit_id: number = await tabTwoQueries.insertHabit(habitName, startDate?.toISOString().split('T')[0], selectedColor.value, intention);
+          const habit_id: number = await tabTwoQueries.insertHabit(habitName, startDate?.toISOString().split('T')[0], selectedColor.value, intention, selectedRoutine);
           await tabTwoQueries.setFrequency(habit_id, frequency)
         }
+        resetForm();
         router.replace(
           {
             pathname: "/(tabs)/three"
@@ -93,20 +103,20 @@ export default function TabTwoScreen() {
           {isEnabled ?
             <View style={styles.formContainer}>
               <Text style={styles.formTitle}>Routine Name</Text>
-              <TextInput style={styles.textInputForm} maxLength={40} placeholderTextColor={'white'} placeholder='ex. Morning Routine' onChangeText={(text) => {
+              <TextInput style={styles.textInputForm} maxLength={40} placeholderTextColor={'white'} placeholder='ex. Morning Routine' value={routineName} onChangeText={(text) => {
                 if (text.length) {
                   setCanSubmit(true);
-                  setroutineName(text);
+                  setRoutineName(text);
                 } else {
                   setCanSubmit(false);
-                  setroutineName(undefined);
+                  setRoutineName(undefined);
                 }
               }} />
             </View>
             :
             <View style={styles.formContainer}>
               <Text style={styles.formTitle}>Habit Name</Text>
-              <TextInput style={styles.textInputForm} maxLength={28} placeholderTextColor={'white'} placeholder='ex. Meditation' onChangeText={(text) => {
+              <TextInput style={styles.textInputForm} maxLength={28} placeholderTextColor={'white'} placeholder='ex. Meditation' value={habitName} onChangeText={(text) => {
                 if (text.length) {
                   setCanSubmit(true);
                   setHabitName(text);
@@ -149,20 +159,23 @@ export default function TabTwoScreen() {
           <View style={styles.divider} />
           <View style={styles.formContainer}>
             <Text style={styles.formTitle}>Intention (Optional)</Text>
-            <TextInput style={styles.textInputForm} placeholderTextColor={'white'} placeholder='ex. To Embrace Mindfulness' onChangeText={setIntention} />
+            <TextInput style={styles.textInputForm} placeholderTextColor={'white'} placeholder='ex. To Embrace Mindfulness' value={intention} onChangeText={setIntention} />
           </View>
           <View style={styles.divider} />
-          {/* {!isEnabled && <View style={styles.formContainer}>
+          {!isEnabled && <View style={styles.formContainer}>
             <Text style={styles.formTitle}>Add to Routine (Optional)</Text>
             <Picker
               style={[styles.textInputForm, { marginBottom: 15 }]}
               selectedValue={selectedRoutine}
+              dropdownIconRippleColor={isEnabled ? '#e17c30' : '#4fa8cc'}
+              dropdownIconColor={isEnabled ? '#e17c30' : '#4fa8cc'}
               onValueChange={(itemValue) => {
                 setSelectedRoutine(itemValue)
               }}>
-              {routineList.map((routineData: any, index: number) => <Picker.Item key={routineData + '-' + index} label={routineData.title} value={routineData.title} />)}
+              <Picker.Item key={'undefined routine'} label={'N/A'} value={undefined} />
+              {routineList[0] ? routineList?.map((routineData: any, index: number) => <Picker.Item key={routineData + '-' + index} label={routineData.title} value={routineData.id} />) : null}
             </Picker>
-          </View>} */}
+          </View>}
           {!isEnabled && <View style={styles.divider} />}
           <TouchableOpacity style={[styles.submitButton, { backgroundColor: canSubmit ? (isEnabled ? '#e17c30' : '#4fa8cc') : 'gray' }]} onPress={() => handleSubmit(isEnabled ? 'routine' : 'habit')} accessibilityLabel='Create your new habit.'
             activeOpacity={canSubmit ? 0.85 : 1.0}>
