@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import { useColorScheme } from '@/components/useColorScheme';
 import { Text } from '@/components/Themed';
 import { Platform } from 'react-native';
-import * as SQLite from "expo-sqlite";
+import { SQLiteProvider } from 'expo-sqlite/next';
 
 
 export {
@@ -53,27 +53,31 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const params = useLocalSearchParams();
 
+
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false, navigationBarHidden: false }} />
-        <Stack.Screen name="habit-details" options={{
-          title: 'Habit Details',
-          presentation: 'modal'
-        }} />
-        <Stack.Screen name="routine-details" options={{
-          title: 'Routine Details',
-          presentation: 'modal'
-        }} />
-        <Stack.Screen name="edit-routine" options={{
-          title: 'Edit Routine',
-          presentation: 'modal'
-        }} />
-        <Stack.Screen name="edit-habit" options={{
-          title: 'Edit Habit',
-          presentation: 'modal'
-        }} />
-      </Stack>
+      <SQLiteProvider databaseName="habit365.db">
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false, navigationBarHidden: false }} />
+          <Stack.Screen name="habit-details" options={{
+            title: 'Habit Details',
+            presentation: 'modal'
+          }} />
+          <Stack.Screen name="routine-details" options={{
+            title: 'Routine Details',
+            presentation: 'modal'
+          }} />
+          <Stack.Screen name="edit-routine" options={{
+            title: 'Edit Routine',
+            presentation: 'modal'
+          }} />
+          <Stack.Screen name="edit-habit" options={{
+            title: 'Edit Habit',
+            presentation: 'modal'
+          }} />
+        </Stack>
+      </SQLiteProvider>
     </ThemeProvider>
   );
 }

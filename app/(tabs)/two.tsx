@@ -37,6 +37,7 @@ export default function TabTwoScreen() {
         }
       } catch (error) {
         console.error('Error in routine list query: ', error)
+        setRoutineList([]);
       }
     }
     queryRoutineList();
@@ -65,7 +66,11 @@ export default function TabTwoScreen() {
           await tabTwoQueries.insertRoutine(routineName, startDate?.toISOString().split('T')[0], selectedColor.value, intention);
         } else if (action === 'habit') {
           const habit_id: number = await tabTwoQueries.insertHabit(habitName, startDate?.toISOString().split('T')[0], selectedColor.value, intention, selectedRoutine);
-          await tabTwoQueries.setFrequency(habit_id, frequency)
+          if (habit_id) {
+            await tabTwoQueries.setFrequency(habit_id, frequency);
+          } else {
+            throw ('error in habit insertr')
+          }
         }
         resetForm();
         router.replace(

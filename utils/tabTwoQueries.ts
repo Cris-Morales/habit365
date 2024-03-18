@@ -20,7 +20,23 @@ const tabTwoQueries: any = {
             return results.lastInsertRowId
         } catch (error) {
             console.error('Error in habit insert: ', error);
+            return (0);
         }
+    },
+    insertHabitSync: (title: string, start_date: string, color: string, intention: string, routine_id: number | undefined) => {
+        const db = SQLite.openDatabaseSync('habit365.db');
+        const results: any = db.runSync('INSERT INTO habits (title, start_date, color, intention) VALUES (?, ?, ?, ?)', title, start_date, color, intention);
+
+        console.log('Habit Inserted, checking routine_id...');
+
+        if (routine_id) {
+            console.log('updating routine_id: ', results.lastInsertRowId, routine_id);
+            db.runSync('UPDATE habits SET routine_id = ? WHERE id = ?;', routine_id, results.lastInsertRowId);
+        }
+
+        console.log('Habit Inserted: ', results.lastInsertRowId, results.changes);
+
+        return results.lastInsertRowId
     },
     insertRoutine: async (title: string, start_date: string, color: string, intention: string) => {
         try {
@@ -31,6 +47,7 @@ const tabTwoQueries: any = {
             return results.lastInsertRowId
         } catch (error) {
             console.error(error);
+            return ([]);
         }
     },
     getRoutineList: async () => {
@@ -42,7 +59,17 @@ const tabTwoQueries: any = {
             return allRows;
         } catch (error) {
             console.error('Error in Routine List Query: ', error);
+            return ([]);
         }
+    },
+    getRoutineListSync: () => {
+        console.log('getRoutineListSync');
+        const db = SQLite.openDatabaseSync('habit365.db');
+
+        const allRows = db.getAllSync('SELECT title, id FROM routines');
+        console.log('Routine Rows Queries: ', allRows);
+        return allRows;
+
     },
     setFrequency: async (habit_id: number, frequency: boolean[]) => {
         try {
@@ -56,8 +83,6 @@ const tabTwoQueries: any = {
                     console.log(`Frequency day ${i} inserted for habit ${habit_id}: `, frequencyResult)
                 }
             }
-
-
         } catch (error) {
             console.error('error in setFrequency: ', error);
         }
