@@ -9,6 +9,7 @@ import AppDatePicker from '@/components/AppDatePicker';
 import { Picker } from '@react-native-picker/picker';
 import { router, useRouter } from 'expo-router';
 import tabTwoQueries from '@/utils/tabTwoQueries';
+import { useSQLiteContext } from 'expo-sqlite/next';
 
 const weekdays: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -25,10 +26,12 @@ export default function TabTwoScreen() {
   const selectedColor = useSharedValue('#75faff');
   const backgroundColorStyle = useAnimatedStyle(() => ({ backgroundColor: selectedColor.value }));
 
+  const db = useSQLiteContext();
+
   useEffect(() => {
     const queryRoutineList = async () => {
       try {
-        const routineListResults = await tabTwoQueries.getRoutineList();
+        const routineListResults = await tabTwoQueries.getRoutineList(db);
         console.log('query results: ', routineListResults);
         if (routineListResults) {
           setRoutineList(routineListResults);
@@ -65,11 +68,11 @@ export default function TabTwoScreen() {
     if (canSubmit) {
       try {
         if (action === 'routine') {
-          await tabTwoQueries.insertRoutine(routineName, startDate?.toISOString().split('T')[0], selectedColor.value, intention);
+          await tabTwoQueries.insertRoutine(db, routineName, startDate?.toISOString().split('T')[0], selectedColor.value, intention);
         } else if (action === 'habit') {
-          const habit_id: number = await tabTwoQueries.insertHabit(habitName, startDate?.toISOString().split('T')[0], selectedColor.value, intention, selectedRoutine);
+          const habit_id: number = await tabTwoQueries.insertHabit(db, habitName, startDate?.toISOString().split('T')[0], selectedColor.value, intention, selectedRoutine);
           if (habit_id) {
-            await tabTwoQueries.setFrequency(habit_id, frequency);
+            await tabTwoQueries.setFrequency(db, habit_id, frequency);
           } else {
             throw ('error in habit insertr')
           }

@@ -2,10 +2,8 @@ import * as SQLite from 'expo-sqlite/next';
 
 
 const tabTwoQueries: any = {
-    insertHabit: async (title: string, start_date: string, color: string, intention: string, routine_id: number | undefined) => {
+    insertHabit: async (db: SQLite.SQLiteDatabase, title: string, start_date: string, color: string, intention: string, routine_id: number | undefined) => {
         try {
-            const db = await SQLite.openDatabaseAsync('habit365.db');
-            // const results: any = await db.runAsync('INSERT INTO habits (title, start_date, color, intention) VALUES (?, ?, ?, ?)', title, start_date, color, intention);
             const results: any = await db.runAsync('INSERT INTO habits (title, start_date, color, intention) VALUES (?, ?, ?, ?)', title, start_date, color, intention);
 
             console.log('Habit Inserted, checking routine_id...');
@@ -23,8 +21,7 @@ const tabTwoQueries: any = {
             return (0);
         }
     },
-    insertHabitSync: (title: string, start_date: string, color: string, intention: string, routine_id: number | undefined) => {
-        const db = SQLite.openDatabaseSync('habit365.db');
+    insertHabitSync: (db: SQLite.SQLiteDatabase, title: string, start_date: string, color: string, intention: string, routine_id: number | undefined) => {
         const results: any = db.runSync('INSERT INTO habits (title, start_date, color, intention) VALUES (?, ?, ?, ?)', title, start_date, color, intention);
 
         console.log('Habit Inserted, checking routine_id...');
@@ -38,9 +35,8 @@ const tabTwoQueries: any = {
 
         return results.lastInsertRowId
     },
-    insertRoutine: async (title: string, start_date: string, color: string, intention: string) => {
+    insertRoutine: async (db: SQLite.SQLiteDatabase, title: string, start_date: string, color: string, intention: string) => {
         try {
-            const db = await SQLite.openDatabaseAsync('habit365.db');
             const results: any = await db.runAsync('INSERT INTO routines (title, start_date, color, intention) VALUES (?, ?, ?, ?)', title, start_date, color, intention);
             console.log('Routine Inserted: ', results.lastInsertRowId, results.changes);
 
@@ -50,10 +46,8 @@ const tabTwoQueries: any = {
             return ([]);
         }
     },
-    getRoutineList: async () => {
+    getRoutineList: async (db: SQLite.SQLiteDatabase) => {
         try {
-            const db = await SQLite.openDatabaseAsync('habit365.db');
-
             const allRows = await db.getAllAsync('SELECT title, id FROM routines');
             return allRows;
         } catch (error) {
@@ -61,18 +55,16 @@ const tabTwoQueries: any = {
             return ([]);
         }
     },
-    getRoutineListSync: () => {
+    getRoutineListSync: (db: SQLite.SQLiteDatabase) => {
         console.log('getRoutineListSync');
-        const db = SQLite.openDatabaseSync('habit365.db');
 
         const allRows = db.getAllSync('SELECT title, id FROM routines');
         console.log('Routine Rows Queries: ', allRows);
         return allRows;
 
     },
-    setFrequency: async (habit_id: number, frequency: boolean[]) => {
+    setFrequency: async (db: SQLite.SQLiteDatabase, habit_id: number, frequency: boolean[]) => {
         try {
-            const db = await SQLite.openDatabaseAsync('habit365.db');
             for (let i = 1; i <= frequency.length; i++) {
                 console.log(habit_id, i, frequency[i - 1])
                 if (frequency[i - 1]) {

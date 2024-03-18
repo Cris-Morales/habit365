@@ -18,10 +18,10 @@ interface habitRow {
 
 export default function TabThreeScreen() {
     const [data, setData] = useState<any>();
+    const db = SQLite.useSQLiteContext();
 
     const readTable = async (action: string) => {
         try {
-            const db = await SQLite.openDatabaseAsync('habit365.db');
             const tableRows = await db.getAllAsync(`SELECT * FROM ${action}`);
             console.log(tableRows)
         } catch (error) {
@@ -31,7 +31,6 @@ export default function TabThreeScreen() {
 
     const readFrequencyTable = async () => {
         try {
-            const db = await SQLite.openDatabaseAsync('habit365.db');
             const tableRows = await db.getAllAsync(`SELECT habits.title, days.day_name FROM habits_days_frequency JOIN days ON habits_days_frequency.day_id = days.id JOIN habits ON habits_days_frequency.habit_id = habits.id`);
             console.log(tableRows)
         } catch (error) {
@@ -41,8 +40,6 @@ export default function TabThreeScreen() {
 
     const dropDatabase = async () => {
         try {
-
-            const db = await SQLite.openDatabaseAsync('habit365.db');
             await db.closeAsync();
             await SQLite.deleteDatabaseAsync('habit365.db');
 
@@ -54,7 +51,6 @@ export default function TabThreeScreen() {
     }
 
     const resetDatabase = () => {
-        const db = SQLite.openDatabaseSync('habit365.db');
         db.closeSync();
     }
 
