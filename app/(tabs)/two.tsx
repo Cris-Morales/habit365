@@ -38,6 +38,8 @@ export default function TabTwoScreen() {
       } catch (error) {
         console.error('Error in routine list query: ', error)
         setRoutineList([]);
+      } finally {
+
       }
     }
     queryRoutineList();
