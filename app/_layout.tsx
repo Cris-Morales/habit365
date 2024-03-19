@@ -54,7 +54,6 @@ function RootLayoutNav() {
   const params = useLocalSearchParams();
 
 
-
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <SQLiteProvider databaseName="habit365.db">

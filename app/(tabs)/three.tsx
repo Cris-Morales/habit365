@@ -50,9 +50,6 @@ export default function TabThreeScreen() {
         }
     }
 
-    const resetDatabase = () => {
-        db.closeSync();
-    }
 
 
     return (
@@ -73,7 +70,6 @@ export default function TabThreeScreen() {
             <Button onPress={() => readTable('habit_entries')} title='read habit_entries table' />
             <Button onPress={() => readTable('routine_entries')} title='read routine_entries table' />
             <Button onPress={dropDatabase} title='delete database' />
-            <Button onPress={resetDatabase} title='reset database' />
         </View>
     );
 }

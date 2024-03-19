@@ -4,9 +4,26 @@ import HabitRow from '@/components/HabitRow';
 import dummyData from '@/components/dummyData';
 import RoutineComponent from '@/components/RoutineComponent';
 import openDatabase from '@/utils/dbInit';
+import { useEffect, useState } from 'react';
+import { useSQLiteContext } from 'expo-sqlite/next';
+import indexQuery from '@/utils/indexQuery';
 
 export default function TabOneScreen() {
+  const [routineData, setRoutineData] = useState<any>([]);
+  const db = useSQLiteContext();
 
+  useEffect(() => {
+    const asyncDataQuery = async () => {
+      try {
+        await indexQuery(db);
+      } catch (error) {
+        console.error('Error in indexQuery: ', error);
+      }
+    }
+    asyncDataQuery();
+  }, [])
+
+  useEffect
   return (
     <View style={styles.container}>
       <FlatList

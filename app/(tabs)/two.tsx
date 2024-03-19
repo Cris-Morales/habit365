@@ -80,7 +80,7 @@ export default function TabTwoScreen() {
         resetForm();
         router.replace(
           {
-            pathname: "/(tabs)/three"
+            pathname: '/(tabs)/'
           }
         )
       } catch (error) {
