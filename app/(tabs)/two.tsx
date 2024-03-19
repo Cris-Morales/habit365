@@ -1,4 +1,4 @@
-import { StyleSheet, FlatList, TextInput, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
+import { StyleSheet, FlatList, TextInput, KeyboardAvoidingView, TouchableOpacity, Pressable } from 'react-native';
 import { GestureHandlerRootView, ScrollView, Switch } from 'react-native-gesture-handler';
 import { useEffect, useState } from 'react';
 import { Text, View } from '@/components/Themed';
@@ -95,9 +95,9 @@ export default function TabTwoScreen() {
     <GestureHandlerRootView style={styles.createHabitContainer}>
       <KeyboardAvoidingView style={styles.createHabitContainer} behavior='height' keyboardVerticalOffset={100}>
         <View style={styles.switchContainer}>
-          <View style={[styles.switchTitleContainer, { backgroundColor: !isEnabled ? '#4fa8cc' : 'gray' }]}>
+          <Pressable style={[styles.switchTitleContainer, { backgroundColor: !isEnabled ? '#4fa8cc' : 'gray' }]} onPress={toggleSwitch}>
             <Text style={styles.switchTitle}>Habit</Text>
-          </View>
+          </Pressable>
           <Switch
             style={styles.switch}
             trackColor={{ false: 'white', true: 'white' }}
@@ -105,9 +105,9 @@ export default function TabTwoScreen() {
             onValueChange={toggleSwitch}
             value={isEnabled}
           />
-          <View style={[styles.switchTitleContainer, { backgroundColor: isEnabled ? '#e17c30' : 'gray' }]}>
+          <Pressable style={[styles.switchTitleContainer, { backgroundColor: isEnabled ? '#e17c30' : 'gray' }]} onPress={toggleSwitch}>
             <Text style={styles.switchTitle}>Routine</Text>
-          </View>
+          </Pressable>
         </View>
         <ScrollView style={styles.createHabitContainer}>
           {isEnabled ?
