@@ -1,9 +1,5 @@
 import * as SQLite from 'expo-sqlite/next';
-
-interface indexData {
-    routine_data: any | null;
-    habit_data: any[] | null;
-}
+import { habit, routine, indexDataShape } from '@/components/types/dataTypes';
 
 // set today's date context
 const todayDateObj = new Date();
@@ -170,6 +166,47 @@ export const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
 export const journalQuery = async (db: SQLite.SQLiteDatabase) => {
     try {
 
+        const habitDataArrayNull: habit[] = await db.getAllAsync(`
+        SELECT habits.id, habits.title, habits.color, habit_entries.status, habit_entries.current_streak, habit_entries.total_days, habit_entries.hit_total, habit_entries.id AS entry_id 
+        FROM habits
+        JOIN habit_entries
+        ON habits.id = habit_entries.habit_id
+        WHERE habit_entries.entry_date = ?
+        AND
+        habits.routine_id IS NULL;
+        `, today);
+
+        const routineQuery: routine[] = await db.getAllAsync(`
+        SELECT routines.id, routines.title, routines.color, routine_entries.percent_complete AS progress, routine_entries.id AS entry_id
+        FROM routines
+        JOIN routine_entries
+        ON routines.id = routine_entries.id
+        WHERE routine_entries.entry_date = ?
+        `, today);
+
+        const journalResults: indexDataShape[] = [{
+            routine_data: null,
+            routine_habits: habitDataArrayNull
+        },]
+
+        for (const routine of routineQuery) {
+            const habitDataArray: habit[] = await db.getAllAsync(`
+            SELECT habits.id, habits.title, habits.color, habit_entries.status, habit_entries.current_streak, habit_entries.total_days, habit_entries.hit_total, habit_entries.id AS entry_id 
+            FROM habits
+            JOIN habit_entries
+            ON habits.id = habit_entries.habit_id
+            WHERE habit_entries.entry_date = ?
+            AND
+            habits.routine_id = ?; 
+            `, today, routine.id);
+
+            journalResults.push({
+                routine_data: routine,
+                routine_habits: habitDataArray
+            });
+        }
+
+        return journalResults;
     } catch (error) {
         console.error('Error in journalQuery: ', error);
     };

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Text, View } from '@/components/Themed';
 import * as SQLite from 'expo-sqlite/next';
 import dbInitScripts from '@/utils/dbInit';
-import indexQueryChecks from '@/utils/indexQueries';
+import { indexQueryChecks, journalQuery } from '@/utils/indexQueries';
 
 interface habitRow {
     color: string;
@@ -110,6 +110,14 @@ export default function TabThreeScreen() {
         }
     }
 
+    const queryIndexData = async () => {
+        try {
+            await journalQuery(db);
+        } catch (error) {
+            console.error('Error in queryIndexData: ', error);
+
+        }
+    }
 
 
     return (
@@ -140,6 +148,7 @@ export default function TabThreeScreen() {
             <Button onPress={() => readTable('routine_entries')} title='read routine_entries' />
             <Button onPress={dropJournalTables} title='drop journal tables' />
             <Button onPress={readJournalTest} title='test journal query.' />
+            <Button onPress={queryIndexData} title='grab index data routine null' />
 
         </View>
     );
