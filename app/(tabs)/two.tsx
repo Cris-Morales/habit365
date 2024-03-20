@@ -32,7 +32,6 @@ export default function TabTwoScreen() {
     const queryRoutineList = async () => {
       try {
         const routineListResults = await tabTwoQueries.getRoutineList(db);
-        console.log('query results: ', routineListResults);
         if (routineListResults) {
           setRoutineList(routineListResults);
         } else {
@@ -41,8 +40,6 @@ export default function TabTwoScreen() {
       } catch (error) {
         console.error('Error in routine list query: ', error)
         setRoutineList([]);
-      } finally {
-
       }
     }
     queryRoutineList();
@@ -55,13 +52,14 @@ export default function TabTwoScreen() {
   };
 
   const resetForm = () => {
-    selectedColor.value = '#75faff';
+    console.log('test form reset');
     setIsEnabled(false);
     setHabitName(undefined);
     setStartDate(new Date());
     setFrequency(Array(7).fill(true));
     setIntention('');
     setCanSubmit(false);
+    setSelectedRoutine('');
   }
 
   const handleSubmit = async (action: string) => {

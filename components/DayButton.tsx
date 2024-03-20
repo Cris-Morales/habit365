@@ -1,8 +1,6 @@
 import { StyleSheet, FlatList, Pressable } from 'react-native';
-import { View, Text } from '@/components/Themed';
+import { Text } from '@/components/Themed';
 import HabitRow from '@/components/HabitRow';
-import dummyData from '@/components/dummyData';
-import RoutineComponent from '@/components/RoutineComponent';
 import { useState } from 'react';
 
 
@@ -11,15 +9,15 @@ export default function DayButton({ index, day, skipDays, setSkipDays, color }: 
     const [pressed, setPressed] = useState<boolean>(skipDays[index]);
 
     const handlePress = () => {
-        const eventValue: boolean = pressed ? false : true
-        setPressed(eventValue);
+        // const eventValue: boolean = pressed ? false : true
+        // setPressed(eventValue);
         const newSkipDays = [...skipDays];
-        newSkipDays[index] = eventValue;
+        newSkipDays[index] = skipDays[index] ? false : true;
         setSkipDays(newSkipDays);
     };
 
     return (
-        <Pressable style={[styles.dayButtonsContainer, { backgroundColor: pressed ? color : 'transparent' }]} onPress={handlePress}>
+        <Pressable style={[styles.dayButtonsContainer, { backgroundColor: skipDays[index] ? color : 'transparent' }]} onPress={handlePress}>
             <Text style={styles.dayButtons}>
                 {day.charAt(0)}
             </Text>
