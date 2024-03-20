@@ -41,7 +41,6 @@ const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
         (SELECT COUNT(*) FROM habits WHERE habits.routine_id = routines.id) 
         AS total_habits
         FROM routines;`);
-        // console.log('routineList', routineList);
 
         // On app first open, no habits => feedback
         if (habitList.length === 0) {
@@ -49,8 +48,8 @@ const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
             return console.log('no habits in database.');
         }
 
-
         const checkTodayEntries: any = await db.getFirstAsync('SELECT COUNT(*) FROM habit_entries WHERE entry_date = ?', today);
+        const checkTodayRoutineEntries: any = await db.getFirstAsync('SELECT COUNT(*) FROM routine_entries WHERE entry_date = ?', today);
         const getYesterdayEntries: any = await db.getAllAsync(`
         SELECT 
         habit_entries.id, 
@@ -69,28 +68,15 @@ const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
         habit_entries.entry_date = ?;
         `, dayIndex + 1, yesterday);
 
-        // console.log('getYesterdayEntries: ', getYesterdayEntries);
-
-        // Do entries for today's journal exist
         if (checkTodayEntries['COUNT(*)'] === 0) {
-            // check dev mode, habits exist, no journal entries at all
-            // initialize all entries, streak = 0, check freq day matches today for status and total days = 0 or 1
-            const checkDevMode: any = await db.getFirstAsync('SELECT COUNT(*) FROM habit_entries');
-
-            /**
-             *@abstract COMPLETE, COME BACK TO THIS FOR HABIT CREATION. On that note, come back to this for edit (adding to routine.);
-             */
-            if (checkDevMode['COUNT(*)'] === 0) {
+            const habitEntriesExist: any = await db.getFirstAsync('SELECT COUNT(*) FROM habit_entries');
+            // Only would occur on dev mode. Or if somehow you would empty your journal tables, while having habits or routines
+            if (habitEntriesExist['COUNT(*)'] === 0) {
                 for (let i = 0; i < habitList.length; i++) {
-                    console.log('habitList values: ', habitList[i].id, habitList[i].day_id);
-
                     await db.runAsync('INSERT INTO habit_entries (habit_id, status, current_streak, hit_total, total_days, entry_date) VALUES (?, ?, ?, ?, ?, ?)', habitList[i].id, habitList[i].day_id ? 0 : 1, 0, 0, habitList[i].day_id ? 1 : 0, today);
                 }
-
             } else {
-                // No entries for today, entries exists, 
-                // Do yesterday's journals exist
-                // true => iterate total days total_days for every insert entry
+                // entries exist from yesterday, initialize habit entries the easy way
                 if (getYesterdayEntries.length) {
                     for (let i = 0; i < getYesterdayEntries.length; i++) {
                         console.log(`yesterday\'s entry index-${i}`, getYesterdayEntries[i]);
@@ -104,25 +90,11 @@ const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
                                             ?);
                                         `, getYesterdayEntries[i].habit_id, getYesterdayEntries[i].day_id ? 0 : 1, getYesterdayEntries[i].current_streak, getYesterdayEntries[i].hit_total, getYesterdayEntries[i].day_id ? getYesterdayEntries[i].total_days + 1 : getYesterdayEntries[i].total_days, today);
                     }
+                    // entries from yesterday don't exist, an unknown time has passed since last open, check is treak is maintained, and calculate total_days
                 } else {
-                    // false => calculate them
-                    // date diff between today and last journal entry
-                    // date diff => 7
-                    //automatic streak = 0
-                    // total_days = date_diff / 7 * count_frequency + funciton(date_diff % 7, check frequency days)
-                    // date diff < 7
-                    // count frequency days between today and last entry
-                    // insert these for every entry
-                    /**
-                     * @abstract checkpoint
-                     */
-
-                    console.log('here: ', habitList);
+                    const dateDiffQuery: any = await db.getAllAsync(`SELECT julianday(?) - julianday((SELECT MAX(entry_date) FROM habit_entries));`, today);
+                    const date_diff = dateDiffQuery[0]["julianday(?) - julianday((SELECT MAX(entry_date) FROM habit_entries))"];
                     for (let i = 0; i < habitList.length; i++) {
-                        console.log('habit entries: ', habitList[i].id);
-
-                        const tableRows: any = await db.getAllAsync(`SELECT julianday(?) - julianday((SELECT MAX(entry_date) FROM habit_entries WHERE habit_id = ?));`, today, habitList[i].id);
-                        const date_diff = tableRows[0]["julianday(?) - julianday((SELECT MAX(entry_date) FROM habit_entries WHERE habit_id = ?))"];
                         const frequencyRow: any = await db.getFirstAsync(`SELECT COUNT(*) FROM habits_days_frequency WHERE habit_id = ?`, habitList[i].id);
                         const frequencyArray: any = await db.getAllAsync('SELECT days.day_number FROM habits_days_frequency JOIN days ON days.id = habits_days_frequency.day_id WHERE habits_days_frequency.habit_id = ?', habitList[i].id);
                         const frequencyObject: any = {};
@@ -161,20 +133,15 @@ const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
                             ?, 
                             ?
                         );
-
                     `, habitList[i].id, habitList[i].day_id ? 0 : 1, habitList[i].id, current_streak, total_days, today);
                     }
                 }
-                //DAYOFWEEK() has been replaced with strftime('%w', date), which returns the day of the week as a number (0 for Sunday, 1 for Monday, etc.).
-                //LIMIT without an ORDER BY clause is replaced with ORDER BY entry_date DESC LIMIT 1 to ensure we get the latest entry.
-                //The BETWEEN condition now uses strftime('%w', date) to get the day of the week.
             }
-            // if routines exist
-            // count 1's for each journal entry, joined with habit data, checking status and matching routine id
-            // count total habits associaed with routine for total
-            // calculate percent complete for habits that dont occur today
+        }
+
+        if (checkTodayRoutineEntries['COUNT(*)'] === 0) {
+            // are there routine entries alread? might need to check
             for (let i = 0; i < routineList.length; i++) {
-                // console.log('routine list values: ', routineList[i].id, routineList[i].total_habits);
                 if (routineList[i].total_habits != 0) {
                     await db.runAsync(`
                         INSERT INTO routine_entries (routine_id, entry_date, percent_complete) 
@@ -191,10 +158,7 @@ const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
                         `, routineList[i].id, today, routineList[i].total_habits, routineList[i].id);
                 }
             }
-
         }
-
-        // console.log('today\'s habit entries initialization/verification complete')
 
         return console.log('today\'s habit entries initialization/verification complete');
     } catch (error) {

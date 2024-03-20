@@ -48,8 +48,8 @@ export default function TabThreeScreen() {
     }
     const readJournalTest = async () => {
         try {
-            const tableRows: any = await db.getAllAsync(`SELECT julianday(?) - julianday((SELECT MAX(entry_date) FROM habit_entries WHERE habit_id = ?));`, today, 1);
-            const date_diff = tableRows[0]["julianday(?) - julianday((SELECT MAX(entry_date) FROM habit_entries WHERE habit_id = ?))"];
+            const dateDiffQuery: any = await db.getAllAsync(`SELECT julianday(?) - julianday((SELECT MAX(entry_date) FROM habit_entries));`, today);
+            const date_diff = dateDiffQuery[0]["julianday(?) - julianday((SELECT MAX(entry_date) FROM habit_entries))"];
             const frequencyRow: any = await db.getFirstAsync(`SELECT COUNT(*) FROM habits_days_frequency WHERE habit_id = ?`, 1);
             const frequencyArray: any = await db.getAllAsync('SELECT days.day_number FROM habits_days_frequency JOIN days ON days.id = habits_days_frequency.day_id WHERE habits_days_frequency.habit_id = ?', 1);
             const frequencyObject: any = {};
@@ -74,6 +74,7 @@ export default function TabThreeScreen() {
                     total_days += 1;
                 }
             }
+            console.log(streak, total_days, date_diff);
         } catch (error) {
             console.error(`Error in journalTest table read: `, error)
         }
