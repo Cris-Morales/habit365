@@ -66,12 +66,12 @@ const tabTwoQueries: any = {
     setFrequency: async (db: SQLite.SQLiteDatabase, habit_id: number, frequency: boolean[]) => {
         try {
             for (let i = 1; i <= frequency.length; i++) {
-                console.log(habit_id, i, frequency[i - 1])
+                // console.log(habit_id, i, frequency[i - 1])
                 if (frequency[i - 1]) {
                     const frequencyResult: any = await db.runAsync(`
                     INSERT INTO habits_days_frequency (habit_id, day_id) VALUES( ?, ?);`, habit_id, i);
 
-                    console.log(`Frequency day ${i} inserted for habit ${habit_id}: `, frequencyResult)
+                    // console.log(`Frequency day ${i} inserted for habit ${habit_id}: `, frequencyResult)
                 }
             }
         } catch (error) {

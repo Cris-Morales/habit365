@@ -1,8 +1,8 @@
 import * as SQLite from 'expo-sqlite/next';
 
 const dbInitScripts: any = {
-    initiateDb: async () => {
-        const db = await SQLite.openDatabaseAsync('habit365.db');
+    initiateDb: async (db: SQLite.SQLiteDatabase) => {
+
         await db.execAsync(`
                 CREATE TABLE IF NOT EXISTS routines (
                     id INTEGER PRIMARY KEY, 
@@ -52,7 +52,19 @@ const dbInitScripts: any = {
                     percent_complete DECIMAL (3, 2),
                     routine_id INTEGER NOT NULL,
                     FOREIGN KEY (routine_id) REFERENCES routines(id));
+                    `);
 
+        await db.execAsync(`
+                INSERT INTO habit_entries (habit_id, current_streak, entry_date, hit_total, status, total_days) VALUES (1, 1, '2024-03-01', 1, 2, 1);
+                INSERT INTO habit_entries (habit_id, current_streak, entry_date, hit_total, status, total_days) VALUES (2, 1, '2024-03-01', 1, 2, 1);
+                    `);
+
+        // await db.execAsync(`
+        //         INSERT INTO habit_entries (habit_id, current_streak, entry_date, hit_total, status, total_days) VALUES (1, 1, '2024-03-18', 1, 2, 1);
+        //         INSERT INTO habit_entries (habit_id, current_streak, entry_date, hit_total, status, total_days) VALUES (2, 1, '2024-03-18', 1, 2, 1);
+        //             `);
+
+        await db.execAsync(`
                 INSERT INTO days (day_number, day_name) VALUES (0, 'Sunday');
                 INSERT INTO days (day_number, day_name) VALUES (1, 'Monday');
                 INSERT INTO days (day_number, day_name) VALUES (2, 'Tuesday');
