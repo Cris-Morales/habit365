@@ -6,20 +6,25 @@ import RoutineComponent from '@/components/RoutineComponent';
 import openDatabase from '@/utils/dbInit';
 import { useEffect, useState } from 'react';
 import { useSQLiteContext } from 'expo-sqlite/next';
+import { indexQueryChecks } from '@/utils/indexQueries';
 
 export default function TabOneScreen() {
-  const [routineData, setRoutineData] = useState<any>([]);
+  const [habitsInDatabase, setHabitsInDatabase] = useState<boolean>(false);
+  const [journalData, setJournalData] = useState<any>([]);
   const db = useSQLiteContext();
 
   // useEffect(() => {
-  //   const asyncDataQuery = async () => {
+  //   const asyncJournalQuery = async () => {
   //     try {
-  //       await indexQuery(db);
+  //       const entriesInitiated: boolean | Error = await indexQueryChecks(db); // initiates today's journal entries
+  //       if (entriesInitiated) {
+  //         // grab journal data
+  //       }
   //     } catch (error) {
   //       console.error('Error in indexQuery: ', error);
   //     }
   //   }
-  //   asyncDataQuery();
+  //   asyncJournalQuery();
   // }, [])
 
   return (
@@ -27,7 +32,9 @@ export default function TabOneScreen() {
       <FlatList
         scrollEnabled={true}
         data={dummyData}
-        keyExtractor={(item, index) => item.routine_data.title + index}
+        keyExtractor={(item, index) => {
+          return (item.routine_data ? item.routine_data.title : 'undefined' + index)
+        }}
         renderItem={({ item }) => {
           return (
             < RoutineComponent routine_data={item.routine_data} routine_habits={item.routine_habits} />

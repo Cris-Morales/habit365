@@ -23,7 +23,7 @@ const yesterday = `${yesterdayYear}-${yesterdayMonth}-${yesterdayDay}`;
 // check every habit's frequency day matches date objects day
 const dayIndex = todayDateObj.getDay();
 
-const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
+export const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
     try {
         const habitList: any = await db.getAllAsync(`
         SELECT habits.id, habits_days_frequency.day_id 
@@ -34,7 +34,6 @@ const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
         WHERE habits_days_frequency.day_id = ? 
         OR habits_days_frequency.day_id IS NULL;
         `, dayIndex + 1, dayIndex + 1);
-        // console.log('habitsList', habitList);
 
         const routineList: any = await db.getAllAsync(`
         SELECT routines.id, 
@@ -45,8 +44,8 @@ const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
         // On app first open, no habits => feedback
         if (habitList.length === 0) {
             // return no habit data text on index tab.
-            return console.log('no habits in database.');
-        }
+            return false;
+        };
 
         const checkTodayEntries: any = await db.getFirstAsync('SELECT COUNT(*) FROM habit_entries WHERE entry_date = ?', today);
         const checkTodayRoutineEntries: any = await db.getFirstAsync('SELECT COUNT(*) FROM routine_entries WHERE entry_date = ?', today);
@@ -74,7 +73,7 @@ const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
             if (habitEntriesExist['COUNT(*)'] === 0) {
                 for (let i = 0; i < habitList.length; i++) {
                     await db.runAsync('INSERT INTO habit_entries (habit_id, status, current_streak, hit_total, total_days, entry_date) VALUES (?, ?, ?, ?, ?, ?)', habitList[i].id, habitList[i].day_id ? 0 : 1, 0, 0, habitList[i].day_id ? 1 : 0, today);
-                }
+                };
             } else {
                 // entries exist from yesterday, initialize habit entries the easy way
                 if (getYesterdayEntries.length) {
@@ -89,7 +88,7 @@ const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
                                             ?,
                                             ?);
                                         `, getYesterdayEntries[i].habit_id, getYesterdayEntries[i].day_id ? 0 : 1, getYesterdayEntries[i].current_streak, getYesterdayEntries[i].hit_total, getYesterdayEntries[i].day_id ? getYesterdayEntries[i].total_days + 1 : getYesterdayEntries[i].total_days, today);
-                    }
+                    };
                     // entries from yesterday don't exist, an unknown time has passed since last open, check is treak is maintained, and calculate total_days
                 } else {
                     const dateDiffQuery: any = await db.getAllAsync(`SELECT julianday(?) - julianday((SELECT MAX(entry_date) FROM habit_entries));`, today);
@@ -106,15 +105,15 @@ const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
                         if (date_diff > 7) {
                             current_streak = 0
                             total_days += Math.trunc(date_diff / 7) * frequencyRow["COUNT(*)"];
-                        }
+                        };
                         for (let i = 0; i < date_diff % 7; i++) {
                             const comparedDay: Date = new Date();
                             comparedDay.setDate(todayDateObj.getDate() - i);
                             if (frequencyObject[comparedDay.getDay()]) {
                                 current_streak = 0;
                                 total_days += 1;
-                            }
-                        }
+                            };
+                        };
 
                         await db.runAsync(`
                         INSERT INTO habit_entries (
@@ -134,10 +133,10 @@ const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
                             ?
                         );
                     `, habitList[i].id, habitList[i].day_id ? 0 : 1, habitList[i].id, current_streak, total_days, today);
-                    }
-                }
-            }
-        }
+                    };
+                };
+            };
+        };
 
         if (checkTodayRoutineEntries['COUNT(*)'] === 0) {
             // are there routine entries alread? might need to check
@@ -156,20 +155,22 @@ const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
                             WHERE routine_id = ?
                         ) AS total_habits_query;
                         `, routineList[i].id, today, routineList[i].total_habits, routineList[i].id);
-                }
-            }
-        }
+                };
+            };
+        };
 
-        return console.log('today\'s habit entries initialization/verification complete');
+        console.log('today\'s habit entries initialization/verification complete');
+        return true;
     } catch (error) {
         console.error('Error in Index Query: ', error);
+        return (new Error('Error in indexQueryChecks'));
     }
 };
 
-const queryIndexData = async (db: SQLite.SQLiteDatabase) => {
+export const journalQuery = async (db: SQLite.SQLiteDatabase) => {
+    try {
 
-
+    } catch (error) {
+        console.error('Error in journalQuery: ', error);
+    };
 };
-
-
-export default indexQueryChecks;

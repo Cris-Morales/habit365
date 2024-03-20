@@ -54,10 +54,10 @@ const dbInitScripts: any = {
                     FOREIGN KEY (routine_id) REFERENCES routines(id));
                     `);
 
-        await db.execAsync(`
-                INSERT INTO habit_entries (habit_id, current_streak, entry_date, hit_total, status, total_days) VALUES (1, 1, '2024-03-01', 1, 2, 1);
-                INSERT INTO habit_entries (habit_id, current_streak, entry_date, hit_total, status, total_days) VALUES (2, 1, '2024-03-01', 1, 2, 1);
-                    `);
+        // await db.execAsync(`
+        //         INSERT INTO habit_entries (habit_id, current_streak, entry_date, hit_total, status, total_days) VALUES (1, 1, '2024-03-01', 1, 2, 1);
+        //         INSERT INTO habit_entries (habit_id, current_streak, entry_date, hit_total, status, total_days) VALUES (2, 1, '2024-03-01', 1, 2, 1);
+        //             `);
 
         // await db.execAsync(`
         //         INSERT INTO habit_entries (habit_id, current_streak, entry_date, hit_total, status, total_days) VALUES (1, 1, '2024-03-18', 1, 2, 1);

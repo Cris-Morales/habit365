@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { View, Text } from '@/components/Themed';
 import RoutineHeader from './RoutineHeader';
 import HabitRow from './HabitRow';
-import { dataShape } from './types/dataTypes';
+import { indexDataShape } from './types/dataTypes';
 
 export default function RoutineComponent({ routine_data, routine_habits }: any) {
 
@@ -14,10 +14,9 @@ export default function RoutineComponent({ routine_data, routine_habits }: any) 
     // just doesn't display the routine row component
     // displays that list on top
     const [routineProgress, setRoutineProgress] = useState<number>(0)
-
     return (
-        <View style={[styles.routineContainer, routine_data.title != 'Undefined' && { borderWidth: 1, borderColor: 'gray' }]}>
-            {routine_data.title != 'Undefined' &&
+        <View style={[styles.routineContainer, (routine_data != null) && { borderWidth: 1, borderColor: 'gray' }]}>
+            {(routine_data != null) &&
                 <RoutineHeader routine_data={routine_data} routineProgress={routineProgress} routineLength={routine_habits.length} />
             }
             <View style={[styles.habitRowContainer, { marginVertical: 10 }]}>
@@ -26,7 +25,7 @@ export default function RoutineComponent({ routine_data, routine_habits }: any) 
                     data={routine_habits}
                     keyExtractor={(item) => item.title}
                     renderItem={({ item }) => {
-                        return (<HabitRow habitData={item} setRoutineProgress={setRoutineProgress} routineProgress={routineProgress} routineTitle={routine_data.title} />)
+                        return (<HabitRow habitData={item} setRoutineProgress={setRoutineProgress} routineProgress={routineProgress} routineNull={routine_data == null} />)
                     }}
                 />
             </View>

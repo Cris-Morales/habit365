@@ -1,31 +1,22 @@
 export interface routine {
     title: string;
     color: string;
-    current_streak: number;
-    total_days: number;
-    date_diff: number;
+    progress: number;
     id: number;
-    start_date: string;
-    created_at: string;
-    longest_streak: number;
-    intention: string | undefined;
-    frequency: boolean[] | undefined;
+    entry_id: number;
 }
 export interface habit {
     id: number;
     title: string;
     color: string;
+    status: number;
     current_streak: number;
     total_days: number;
-    date_diff: number;
-    start_date: string;
-    created_at: string;
-    longest_streak: number;
-    intention: string | undefined;
-    frequency: boolean[]
+    hit_total: number;
+    entry_id: number;
 }
 
-export interface dataShape {
-    routine_data: routine;
+export interface indexDataShape {
+    routine_data: routine | null;
     routine_habits: habit[];
 }

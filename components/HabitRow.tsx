@@ -10,10 +10,10 @@ interface listData {
 }
 
 
-export default function HabitRow({ habitData, setRoutineProgress, routineProgress, routineTitle }: any) {
-    const [streak, setStreak] = useState<number>(habitData.current_streak)
-    const [total, setTotal] = useState<number>(habitData.total_days)
-    const [perHit, setPerHit] = useState<number>(Math.round(total / habitData.date_diff * 1000) / 10)
+export default function HabitRow({ habitData, setRoutineProgress, routineProgress, routineNull }: any) {
+    const [currentStreak, setCurrentStreak] = useState<number>(habitData.current_streak);
+    const [hitTotal, setHitTotal] = useState<number>(habitData.hit_total);
+    const [perHit, setPerHit] = useState<number>(Math.round(hitTotal / habitData.total_days * 1000) / 10);
 
     const dataArray: listData[] = [
         {
@@ -22,11 +22,11 @@ export default function HabitRow({ habitData, setRoutineProgress, routineProgres
         },
         {
             title: 'Streak',
-            data: `${streak}`
+            data: `${currentStreak}`
         },
         {
             title: 'Total',
-            data: `${total} / ${habitData.date_diff}`
+            data: `${hitTotal} / ${habitData.total_days}`
         }
     ]
 
@@ -44,15 +44,15 @@ export default function HabitRow({ habitData, setRoutineProgress, routineProgres
 
     const statsUpdate = (isChecked: boolean): void => {
         if (isChecked) {
-            setStreak(streak + 1)
-            setTotal(total + 1)
+            setCurrentStreak(currentStreak + 1)
+            setHitTotal(hitTotal + 1)
             setRoutineProgress(routineProgress + 1)
-            setPerHit(Math.round((total + 1) / habitData.date_diff * 1000) / 10)
+            setPerHit(Math.round((hitTotal + 1) / habitData.total_days * 1000) / 10)
         } else {
-            setStreak(streak - 1)
-            setTotal(total - 1)
+            setCurrentStreak(currentStreak - 1)
+            setHitTotal(hitTotal - 1)
             setRoutineProgress(routineProgress - 1)
-            setPerHit(Math.round((total - 1) / habitData.date_diff * 1000) / 10)
+            setPerHit(Math.round((hitTotal - 1) / habitData.total_days * 1000) / 10)
         }
         // triggers a database update, do not update state until we receive an okay from the transaction function, ie. The Tanstack Query function. For now it's just a simple state function update.
     }
@@ -76,7 +76,7 @@ export default function HabitRow({ habitData, setRoutineProgress, routineProgres
     }
 
     return (
-        <View style={[styles.habitView, routineTitle == 'Undefined' && { borderWidth: 1, borderColor: 'gray', marginTop: 10, height: 90 }]}>
+        <View style={[styles.habitView, routineNull && { borderWidth: 1, borderColor: 'gray', marginTop: 10, height: 90 }]}>
             <Pressable onLongPress={openHabitModal} style={styles.modalButton}>
                 <View style={{
                     flex: 1,
