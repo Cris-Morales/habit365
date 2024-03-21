@@ -10,10 +10,10 @@ interface listData {
 }
 
 
-export default function HabitRow({ habitData, setRoutineProgress, routineProgress, routineNull }: any) {
+export default function HabitRow({ habitData, habitsComplete, setHabitsComplete, routineNull }: any) {
     const [currentStreak, setCurrentStreak] = useState<number>(habitData.current_streak);
     const [hitTotal, setHitTotal] = useState<number>(habitData.hit_total);
-    const [perHit, setPerHit] = useState<number>(Math.round(hitTotal / habitData.total_days * 1000) / 10);
+    const [perHit, setPerHit] = useState<number>(habitData.total_days ? Math.round(habitData.hit_total / habitData.total_days * 1000) / 10 : 0);
 
     const dataArray: listData[] = [
         {
@@ -46,12 +46,12 @@ export default function HabitRow({ habitData, setRoutineProgress, routineProgres
         if (isChecked) {
             setCurrentStreak(currentStreak + 1)
             setHitTotal(hitTotal + 1)
-            setRoutineProgress(routineProgress + 1)
+            setHabitsComplete(habitsComplete + 1)
             setPerHit(Math.round((hitTotal + 1) / habitData.total_days * 1000) / 10)
         } else {
             setCurrentStreak(currentStreak - 1)
             setHitTotal(hitTotal - 1)
-            setRoutineProgress(routineProgress - 1)
+            setHabitsComplete(habitsComplete - 1)
             setPerHit(Math.round((hitTotal - 1) / habitData.total_days * 1000) / 10)
         }
         // triggers a database update, do not update state until we receive an okay from the transaction function, ie. The Tanstack Query function. For now it's just a simple state function update.

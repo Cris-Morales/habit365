@@ -1,37 +1,19 @@
 import { StyleSheet, FlatList } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import RoutineComponent from '@/components/RoutineComponent';
-import { useEffect, useState } from 'react';
 import { useSQLiteContext } from 'expo-sqlite/next';
-import { indexQueryChecks, journalQuery } from '@/utils/indexQueries';
+import useJournalData from '@/utils/useJournalData';
+import { indexDataShape } from '@/components/types/dataTypes';
 
 export default function TabOneScreen() {
-  const [habitsInDatabase, setHabitsInDatabase] = useState<boolean>(false);
-  const [journalData, setJournalData] = useState<any>([]);
   const db = useSQLiteContext();
 
-  useEffect(() => {
-    const asyncJournalQuery = async () => {
-      try {
-        console.log('index query');
-        const entriesInitiated: boolean | Error = await indexQueryChecks(db);
-        if (entriesInitiated) {
-          setHabitsInDatabase(true);
-          const queryJournalData = await journalQuery(db);
-          setJournalData(queryJournalData)
-        } else {
-          setHabitsInDatabase(false);
-        }
-      } catch (error) {
-        console.error('Error in indexQuery: ', error);
-      }
-    }
-    asyncJournalQuery();
-  }, [])
+  const journalData: indexDataShape[] | null = useJournalData(db);
 
+  console.log(journalData);
   return (
     <View style={styles.container}>
-      {habitsInDatabase ?
+      {journalData != null ?
         <FlatList
           scrollEnabled={true}
           data={journalData}

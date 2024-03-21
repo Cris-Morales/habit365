@@ -16,11 +16,11 @@ const weekdays: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursda
 export default function TabTwoScreen() {
   const [isEnabled, setIsEnabled] = useState(false); // false - habit, true - routine
   const [habitName, setHabitName] = useState<string | undefined>();
-  const [routineName, setRoutineName] = useState<string | undefined>();
+  const [routineName, setRoutineName] = useState<string>('');
   const [startDate, setStartDate] = useState<Date | undefined>(new Date()) // DATE -  passed to database in UTC format YYYY-MM-DD,
-  const [selectedRoutine, setSelectedRoutine] = useState<string>('');
+  const [selectedRoutine, setSelectedRoutine] = useState<number | null>(null);
   const [frequency, setFrequency] = useState<boolean[]>(Array(7).fill(true));
-  const [intention, setIntention] = useState<string>('');
+  const [intention, setIntention] = useState<string | null>(null);
   const [canSubmit, setCanSubmit] = useState<boolean>(false);
   const [routineList, setRoutineList] = useState<any>([]);
   const selectedColor = useSharedValue('#75faff');
@@ -52,14 +52,14 @@ export default function TabTwoScreen() {
   };
 
   const resetForm = () => {
-    console.log('test form reset');
     setIsEnabled(false);
     setHabitName(undefined);
     setStartDate(new Date());
     setFrequency(Array(7).fill(true));
     setIntention('');
     setCanSubmit(false);
-    setSelectedRoutine('');
+    setSelectedRoutine(null);
+    setRoutineName('');
   }
 
   const handleSubmit = async (action: string) => {
@@ -68,12 +68,7 @@ export default function TabTwoScreen() {
         if (action === 'routine') {
           await tabTwoQueries.insertRoutine(db, routineName, startDate?.toISOString().split('T')[0], selectedColor.value, intention);
         } else if (action === 'habit') {
-          const habit_id: number = await tabTwoQueries.insertHabit(db, habitName, startDate?.toISOString().split('T')[0], selectedColor.value, intention, selectedRoutine);
-          if (habit_id) {
-            await tabTwoQueries.setFrequency(db, habit_id, frequency);
-          } else {
-            throw ('error in habit insertr')
-          }
+          await tabTwoQueries.insertHabit(db, habitName, startDate?.toISOString().split('T')[0], selectedColor.value, intention, selectedRoutine, frequency);
         }
         resetForm();
         router.replace(
@@ -89,6 +84,7 @@ export default function TabTwoScreen() {
       console.error('Cannot submit without a Name');
     }
   }
+
   return (
     <GestureHandlerRootView style={styles.createHabitContainer}>
       <KeyboardAvoidingView style={styles.createHabitContainer} behavior='height' keyboardVerticalOffset={100}>
@@ -180,7 +176,7 @@ export default function TabTwoScreen() {
               onValueChange={(itemValue) => {
                 setSelectedRoutine(itemValue)
               }}>
-              <Picker.Item key={'undefined routine'} label={'N/A'} value={undefined} />
+              <Picker.Item key={'undefined routine'} label={'N/A'} value={null} />
               {routineList[0] ? routineList?.map((routineData: any, index: number) => <Picker.Item key={routineData + '-' + index} label={routineData.title} value={routineData.id} />) : null}
             </Picker>
           </View>}

@@ -5,7 +5,7 @@ import { router } from 'expo-router'
 import RoutineFeedback from './RoutineFeedback';
 
 
-export default function RoutineHeader({ routine_data, routineProgress, routineLength }: any) {
+export default function RoutineHeader({ routine_data, habitsComplete, totalHabits }: any) {
 
     const openRoutineModal = () => {
         router.navigate(
@@ -21,7 +21,7 @@ export default function RoutineHeader({ routine_data, routineProgress, routineLe
 
     return (
         <View style={styles.routineHeader}>
-            <RoutineFeedback routineProgress={routineProgress} routineLength={routineLength} routine_data={routine_data} />
+            <RoutineFeedback habitsComplete={habitsComplete} totalHabits={totalHabits} routine_data={routine_data} />
             <Pressable onLongPress={openRoutineModal} style={styles.modalButton}>
                 <View style={{
                     flex: 0.75,
@@ -33,7 +33,7 @@ export default function RoutineHeader({ routine_data, routineProgress, routineLe
             </Pressable>
             <Text style={{
                 flex: 1,
-            }}>{routineProgress} / {routineLength}</Text>
+            }}>{habitsComplete} / {totalHabits}</Text>
         </View>
     );
 }

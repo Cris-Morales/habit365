@@ -3,9 +3,9 @@ import { useState } from 'react';
 import { View, Text } from '@/components/Themed';
 import RoutineHeader from './RoutineHeader';
 import HabitRow from './HabitRow';
-import { indexDataShape } from './types/dataTypes';
+import { routine, habit, indexDataShape } from './types/dataTypes';
 
-export default function RoutineComponent({ routine_data, routine_habits }: any) {
+export default function RoutineComponent({ routine_data, routine_habits }: indexDataShape) {
 
     // makes db query to routine entries
     // routes to routine modal
@@ -13,11 +13,11 @@ export default function RoutineComponent({ routine_data, routine_habits }: any) 
     // edge cases, what happens if a habit's routine is null?
     // just doesn't display the routine row component
     // displays that list on top
-    const [routineProgress, setRoutineProgress] = useState<number>(0)
+    const [habitsComplete, setHabitsComplete] = useState<number | undefined>(routine_data?.habits_complete)
     return (
         <View style={[styles.routineContainer, (routine_data != null) && { borderWidth: 1, borderColor: 'gray' }]}>
             {(routine_data != null) &&
-                <RoutineHeader routine_data={routine_data} routineProgress={routineProgress} routineLength={routine_habits.length} />
+                <RoutineHeader routine_data={routine_data} habitsComplete={habitsComplete} totalHabits={routine_data.total_habits} />
             }
             <View style={[styles.habitRowContainer, { marginVertical: 10 }]}>
                 <FlatList
@@ -25,7 +25,7 @@ export default function RoutineComponent({ routine_data, routine_habits }: any) 
                     data={routine_habits}
                     keyExtractor={(item) => item.title}
                     renderItem={({ item }) => {
-                        return (<HabitRow habitData={item} setRoutineProgress={setRoutineProgress} routineProgress={routineProgress} routineNull={routine_data == null} />)
+                        return (<HabitRow habitData={item} habitsComplete={habitsComplete} setHabitsComplete={setHabitsComplete} routineNull={routine_data === null} />)
                     }}
                 />
             </View>

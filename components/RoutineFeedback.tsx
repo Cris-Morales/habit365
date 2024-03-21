@@ -3,25 +3,25 @@ import { useState, useRef, useEffect } from 'react';
 import { Text, View } from '@/components/Themed';
 import Svg, { Circle, Rect } from 'react-native-svg';
 
-export default function RoutineFeedback({ routineProgress, routineLength, routine_data }: any) {
-    const [bubbleProgress, setBubbleProgress] = useState<number>(0) // as this moves to 50, the bubble moves closer to full
+export default function RoutineFeedback({ habitsComplete, totalHabits, routine_data }: any) {
+    const [bubbleProgress, setBubbleProgress] = useState<number>(100 * habitsComplete / totalHabits) // as this moves to 50, the bubble moves closer to full
     const fillAnimation = useRef(new Animated.Value(0)).current; // animation that makes it look like the bubble is filling
     const [borderColor, setborderColor] = useState<string>('gray');
 
     useEffect(() => {
-        setBubbleProgress(100 * routineProgress / routineLength)
+        setBubbleProgress(100 * habitsComplete / totalHabits)
         Animated.timing(fillAnimation, {
-            toValue: (-70) * routineProgress / routineLength,
+            toValue: (-70) * habitsComplete / totalHabits,
             duration: 0,
             useNativeDriver: true,
-        }).start()
+        }).start();
 
-        if (routineProgress === routineLength) {
+        if (habitsComplete === totalHabits) {
             setborderColor(routine_data.color);
         } else {
-            setborderColor('gray')
+            setborderColor('gray');
         }
-    }, [routineProgress])
+    }, [habitsComplete])
 
 
     return (

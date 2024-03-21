@@ -1,9 +1,10 @@
 export interface routine {
     title: string;
     color: string;
-    progress: number;
     id: number;
     entry_id: number;
+    total_habits: number;
+    habits_complete: number
 }
 export interface habit {
     id: number;

@@ -119,6 +119,42 @@ export default function TabThreeScreen() {
         }
     }
 
+    const habitFrequency = async () => {
+        try {
+            const results = await db.getAllAsync(`SELECT title, day_id FROM habits JOIN habits_days_frequency ON habits.id = habits_days_frequency.habit_id`);
+            console.log(results, dayIndex)
+        } catch (error) {
+            console.error('Error in queryIndexData: ', error);
+
+        }
+    }
+
+    const routineEntriesToday = async () => {
+        try {
+
+            console.log(yesterday, today);
+            //     const results = await db.getAllAsync(`
+            // SELECT routines.id, routines.title, routines.color, routine_entries.total_habits, routine_entries.habits_complete, routine_entries.id AS entry_id
+            // FROM routines
+            // JOIN routine_entries
+            // ON routines.id = routine_entries.id
+            // WHERE routine_entries.entry_date = ?
+            // `, today);
+            const results = await db.getAllAsync(`
+        SELECT routines.id, routines.title, routines.color, routine_entries.total_habits, routine_entries.habits_complete, routine_entries.id AS entry_id
+        FROM routine_entries
+        JOIN routines
+        ON routine_entries.routine_id = routines.id
+        WHERE routine_entries.entry_date = ?
+        `, today);
+
+            console.log(results);
+        } catch (error) {
+            console.error('error in routine entries today: ', error);
+
+        }
+    }
+
 
     return (
         <View style={{ flex: 1 }}>
@@ -128,8 +164,6 @@ export default function TabThreeScreen() {
             <Text>Toggle App Open Habit</Text>
             <Text>Day/Night Mode</Text>
             <Text>About this Project</Text>
-            <Text>Github</Text>
-            <Text>Database Should be Created</Text>
             <Button onPress={() => dbInitScripts.initiateDb(db)} title='initiate database' />
             <Button onPress={() => readTable('habits')} title='read habits table' />
             <Button onPress={() => readTable('routines')} title='read routines table' />
@@ -149,7 +183,8 @@ export default function TabThreeScreen() {
             <Button onPress={dropJournalTables} title='drop journal tables' />
             <Button onPress={readJournalTest} title='test journal query.' />
             <Button onPress={queryIndexData} title='grab index data routine null' />
-
+            <Button onPress={habitFrequency} title='grab habits that occur today' />
+            <Button onPress={routineEntriesToday} title='grab routine entries today' />
         </View>
     );
 }

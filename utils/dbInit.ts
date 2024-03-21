@@ -49,10 +49,19 @@ const dbInitScripts: any = {
                 CREATE TABLE IF NOT EXISTS routine_entries (
                     id INTEGER PRIMARY KEY,
                     entry_date DATE NOT NULL,
-                    percent_complete DECIMAL (3, 2),
+                    total_habits integer,
+                    habits_complete integer,
                     routine_id INTEGER NOT NULL,
                     FOREIGN KEY (routine_id) REFERENCES routines(id));
                     `);
+        //TESTING SOMETHING
+        //             CREATE TABLE IF NOT EXISTS routine_entries(
+        //                 id INTEGER PRIMARY KEY,
+        //                 entry_date DATE NOT NULL,
+        //                 percent_complete DECIMAL(3, 2),
+        //                 routine_id INTEGER NOT NULL,
+        //                 FOREIGN KEY(routine_id) REFERENCES routines(id));
+        // `);
 
         // await db.execAsync(`
         //         INSERT INTO habit_entries (habit_id, current_streak, entry_date, hit_total, status, total_days) VALUES (1, 1, '2024-03-01', 1, 2, 1);

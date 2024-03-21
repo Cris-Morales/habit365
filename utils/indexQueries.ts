@@ -36,6 +36,7 @@ export const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
         (SELECT COUNT(*) FROM habits WHERE habits.routine_id = routines.id) 
         AS total_habits
         FROM routines;`);
+        console.log('habit count')
 
         // On app first open, no habits => feedback
         if (habitList.length === 0) {
@@ -138,19 +139,13 @@ export const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
             // are there routine entries alread? might need to check
             for (let i = 0; i < routineList.length; i++) {
                 if (routineList[i].total_habits != 0) {
+                    console.log('routine_entries insert')
                     await db.runAsync(`
-                        INSERT INTO routine_entries (routine_id, entry_date, percent_complete) 
+                        INSERT INTO routine_entries (routine_id, entry_date, habits_complete, total_habits) 
                         SELECT ?, ?, 
-                            (SELECT COUNT(*) * 100.0 / total_habits 
-                            FROM habit_entries AS he 
-                            LEFT JOIN habits AS h ON he.habit_id = h.id 
-                            WHERE h.routine_id = ? AND he.status = 1) 
-                        FROM (
-                            SELECT COUNT(*) as total_habits
-                            FROM habits
-                            WHERE routine_id = ?
-                        ) AS total_habits_query;
-                        `, routineList[i].id, today, routineList[i].total_habits, routineList[i].id);
+                        (SELECT COUNT(*) FROM habits JOIN habit_entries ON habits.id = habit_entries.habit_id WHERE routine_id = ? AND habit_entries.status = 1),
+                        (SELECT COUNT(*) FROM habits WHERE routine_id = ?)
+                        `, routineList[i].id, today, routineList[i].total_habits, routineList[i].id, routineList[i].total_habits, routineList[i].id);
                 };
             };
         };
@@ -165,7 +160,6 @@ export const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
 
 export const journalQuery = async (db: SQLite.SQLiteDatabase) => {
     try {
-
         const habitDataArrayNull: habit[] = await db.getAllAsync(`
         SELECT habits.id, habits.title, habits.color, habit_entries.status, habit_entries.current_streak, habit_entries.total_days, habit_entries.hit_total, habit_entries.id AS entry_id 
         FROM habits
@@ -177,17 +171,20 @@ export const journalQuery = async (db: SQLite.SQLiteDatabase) => {
         `, today);
 
         const routineQuery: routine[] = await db.getAllAsync(`
-        SELECT routines.id, routines.title, routines.color, routine_entries.percent_complete AS progress, routine_entries.id AS entry_id
-        FROM routines
-        JOIN routine_entries
-        ON routines.id = routine_entries.id
+        SELECT routines.id, routines.title, routines.color, routine_entries.total_habits, routine_entries.habits_complete, routine_entries.id AS entry_id
+        FROM routine_entries
+        JOIN routines
+        ON routine_entries.routine_id = routines.id
         WHERE routine_entries.entry_date = ?
         `, today);
 
+        console.log('cp3: ', routineQuery);
         const journalResults: indexDataShape[] = [{
             routine_data: null,
             routine_habits: habitDataArrayNull
         },]
+
+        console.log('cp4: ', journalResults);
 
         for (const routine of routineQuery) {
             const habitDataArray: habit[] = await db.getAllAsync(`
@@ -199,15 +196,23 @@ export const journalQuery = async (db: SQLite.SQLiteDatabase) => {
             AND
             habits.routine_id = ?; 
             `, today, routine.id);
-
+            // refresh
             journalResults.push({
                 routine_data: routine,
                 routine_habits: habitDataArray
             });
+            console.log('cp5: ', {
+                routine_data: routine,
+                routine_habits: habitDataArray
+            });
+
         }
+
+        console.log('cp6: ', journalResults);
 
         return journalResults;
     } catch (error) {
         console.error('Error in journalQuery: ', error);
+        return null;
     };
 };
