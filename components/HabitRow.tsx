@@ -29,19 +29,6 @@ export default function HabitRow({ habitData, habitsComplete, setHabitsComplete,
 
     const db = useSQLiteContext();
 
-    const dbHabitEntryUpdate = async (status: boolean) => {
-        try {
-            const results = await db.runAsync(`UPDATE habit_entries SET status = ?, hit_total = ?, current_streak = ? WHERE habit_entries.id = ?;`, status ? 2 : 0, status ? habitData.hit_total + 1 : habitData.hit_total - 1, status ? habitData.current_streak + 1 : habitData.current_streak - 1, habitData.entry_id);
-            // console.log(`habit ${habitData.title} entry changed: `, results.changes);
-            if (routineEntryId) {
-                const routineEntryResults = await db.runAsync(`UPDATE routine_entries SET habits_complete = ? WHERE id = ?`, status ? habitsComplete + 1 : habitsComplete - 1, routineEntryId);
-                console.log(`routine entry (entry id: ${routineEntryId}) changed: `, routineEntryResults.changes);
-            }
-        } catch (error) {
-            console.log('error in habitEntryUpdate: ', error);
-        }
-    };
-
     const dataArray: listData[] = [
         {
             title: 'Hit Rate',
@@ -69,22 +56,64 @@ export default function HabitRow({ habitData, habitsComplete, setHabitsComplete,
         )
     }
 
-    const statsUpdate = (isChecked: boolean): void => {
-        if (isChecked) {
-            setCurrentStreak(currentStreak + 1)
-            setHitTotal(hitTotal + 1)
-            setHabitsComplete(habitsComplete + 1)
-            setPerHit(Math.round((hitTotal + 1) / habitData.total_days * 1000) / 10)
-            dbHabitEntryUpdate(isChecked);
-        } else {
-            setCurrentStreak(currentStreak - 1)
-            setHitTotal(hitTotal - 1)
-            setHabitsComplete(habitsComplete - 1)
-            setPerHit(Math.round((hitTotal - 1) / habitData.total_days * 1000) / 10)
-            dbHabitEntryUpdate(isChecked);
+    const statsUpdate = async (isChecked: boolean) => {
+
+        try {
+            if (isChecked) {
+                setCurrentStreak(currentStreak + 1);
+                setHitTotal(hitTotal + 1);
+                setHabitsComplete(habitsComplete + 1);
+                setPerHit(Math.round((hitTotal + 1) / habitData.total_days * 1000) / 10);
+                // update currentStreak
+                // update hitTotal
+                // if routine_id exists, update habits_complete
+                // is this a new personal best? set pr in entry to true, and display that on details
+                // else, continue
+
+            } else {
+                setCurrentStreak(currentStreak - 1);
+                setHitTotal(hitTotal - 1);
+                setHabitsComplete(habitsComplete - 1);
+                setPerHit(Math.round((hitTotal - 1) / habitData.total_days * 1000) / 10);
+                // changing your mind or just messing around
+
+                // update current streak, hit total, 
+                // if routine_id exists, decrement habits_complete
+                // is new pr true? (need to see results for boolean)
+                // if so, turn it false, display should be updated on details
+
+                // indexQueries, ifPrev entry exists, check if it was a new pr, 
+                // if true, update its longest_streak on habits table.
+            }
+        } catch (error) {
+            console.error('error in stats update: ', error);
+
         }
+
         // triggers a database update, do not update state until we receive an okay from the transaction function, ie. The Tanstack Query function. For now it's just a simple state function update.
     }
+
+    const dbHabitEntryUpdate = async (isChecked: boolean) => {
+        try {
+            const results = await db.runAsync(`UPDATE habit_entries SET status = ?, hit_total = hit_total, current_streak = ? WHERE habit_entries.id = ?;`, isChecked ? 2 : 0, isChecked ? habitData.hit_total + 1 : habitData.hit_total - 1, isChecked ? habitData.current_streak + 1 : habitData.current_streak - 1, habitData.entry_id);
+
+            if (isChecked) {
+                if ((habitData.current_streak + 1) > habitData.longest_streak) {
+                    await db.runAsync(`UPDATE habits SET longest_streak = ? WHERE id = ?`, habitData.current_streak + 1, habitData.id);
+                }
+            } else {
+                await db.runAsync(`UPDATE habits SET longest_streak = ? WHERE id = ?`, habitData.current_streak - 1, habitData.id);
+            }
+            // console.log(`habit ${habitData.title} entry changed: `, results.changes);
+            if (routineEntryId) {
+                const routineEntryResults = await db.runAsync(`UPDATE routine_entries SET habits_complete = ? WHERE id = ?`, isChecked ? habitsComplete + 1 : habitsComplete - 1, routineEntryId);
+                console.log(`routine entry (entry id: ${routineEntryId}) changed: `, routineEntryResults.changes);
+            }
+        } catch (error) {
+            console.log('error in habitEntryUpdate: ', error);
+        }
+    };
+
 
     const HabitData = ({ item }: { item: listData }) => {
         return (

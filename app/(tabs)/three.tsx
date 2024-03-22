@@ -1,4 +1,4 @@
-import { StyleSheet, Button, } from 'react-native';
+import { StyleSheet, Button, ScrollView, } from 'react-native';
 import { useState, useEffect } from 'react';
 import { Text, View } from '@/components/Themed';
 import * as SQLite from 'expo-sqlite/next';
@@ -157,7 +157,7 @@ export default function TabThreeScreen() {
 
 
     return (
-        <View style={{ flex: 1 }}>
+        <ScrollView style={{ flex: 1 }}>
 
             <Text>Color Scheme</Text>
             <Text>Set User Name</Text>
@@ -185,6 +185,6 @@ export default function TabThreeScreen() {
             <Button onPress={queryIndexData} title='grab index data routine null' />
             <Button onPress={habitFrequency} title='grab habits that occur today' />
             <Button onPress={routineEntriesToday} title='grab routine entries today' />
-        </View>
+        </ScrollView>
     );
 }

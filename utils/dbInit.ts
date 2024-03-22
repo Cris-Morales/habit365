@@ -44,6 +44,7 @@ const dbInitScripts: any = {
                     hit_total INTEGER NOT NULL,
                     total_days INTEGER NOT NULL,
                     entry_date DATE NOT NULL,
+                    new_streak_pr BOOLEAN,
                     FOREIGN KEY (habit_id) REFERENCES habits(id));
 
                 CREATE TABLE IF NOT EXISTS routine_entries (

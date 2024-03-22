@@ -50,8 +50,8 @@ export default function HabitButton({ statsUpdate, habitColor, status }: props) 
                     useNativeDriver: true,
                 })
             ]).start();
-            statsUpdate(true);
             setPressed(true);
+            statsUpdate(true);
         } else {
             Animated.sequence([
                 Animated.timing(springAnimation, {
@@ -72,8 +72,8 @@ export default function HabitButton({ statsUpdate, habitColor, status }: props) 
                         useNativeDriver: true,
                     })
                 ])]).start();
-            statsUpdate(false);
             setPressed(false);
+            statsUpdate(false);
         };
 
     };

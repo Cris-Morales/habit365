@@ -143,9 +143,9 @@ export const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
                     await db.runAsync(`
                         INSERT INTO routine_entries (routine_id, entry_date, habits_complete, total_habits) 
                         SELECT ?, ?, 
-                        (SELECT COUNT(*) FROM habits JOIN habit_entries ON habits.id = habit_entries.habit_id WHERE routine_id = ? AND habit_entries.status = 1),
+                        (SELECT COUNT(*) FROM habits JOIN habit_entries ON habits.id = habit_entries.habit_id WHERE routine_id = ? AND habit_entries.status = 1 AND habit_entries.entry_date = ?),
                         ?
-                        `, routineList[i].id, today, routineList[i].id, routineList[i].total_habits);
+                        `, routineList[i].id, today, routineList[i].id, today, routineList[i].total_habits);
                 };
             };
         };
@@ -161,7 +161,7 @@ export const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
 export const journalQuery = async (db: SQLite.SQLiteDatabase) => {
     try {
         const habitDataArrayNull: habit[] = await db.getAllAsync(`
-        SELECT habits.id, habits.title, habits.color, habit_entries.status, habit_entries.current_streak, habit_entries.total_days, habit_entries.hit_total, habit_entries.id AS entry_id 
+        SELECT habits.id, habits.title, habits.color, habits.longest_streak, habit_entries.status, habit_entries.current_streak, habit_entries.total_days, habit_entries.hit_total, habit_entries.id AS entry_id 
         FROM habits
         JOIN habit_entries
         ON habits.id = habit_entries.habit_id
@@ -185,7 +185,7 @@ export const journalQuery = async (db: SQLite.SQLiteDatabase) => {
 
         for (const routine of routineQuery) {
             const habitDataArray: habit[] = await db.getAllAsync(`
-            SELECT habits.id, habits.title, habits.color, habit_entries.status, habit_entries.current_streak, habit_entries.total_days, habit_entries.hit_total, habit_entries.id AS entry_id 
+            SELECT habits.id, habits.title, habits.color, habits.longest_streak, habit_entries.status, habit_entries.current_streak, habit_entries.total_days, habit_entries.hit_total, habit_entries.id AS entry_id 
             FROM habits
             JOIN habit_entries
             ON habits.id = habit_entries.habit_id

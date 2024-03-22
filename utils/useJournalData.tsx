@@ -16,7 +16,8 @@ const useJournalData = (db: SQLite.SQLiteDatabase) => {
                     const jouranlData: indexDataShape[] | any = await journalQuery(db);
                     setData(jouranlData);
                 } else {
-                    throw new Error('No habits in the database');
+                    console.log('No habits in the database');
+                    return
                 }
             } catch (error) {
                 console.error('Error in Journal Data Query: ', error);
