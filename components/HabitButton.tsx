@@ -1,31 +1,37 @@
-import { StyleSheet, Pressable, Animated } from 'react-native';
+import { StyleSheet, Pressable, Animated, GestureResponderEvent } from 'react-native';
+import { Text } from './Themed';
 import { useState, useRef } from 'react';
 
 interface props {
     statsUpdate: (checked: boolean) => void;
     habitColor: string;
+    status: number;
 }
 
 
 
-export default function HabitButton({ statsUpdate, habitColor }: props) {
+export default function HabitButton({ statsUpdate, habitColor, status }: props) {
 
-    const [pressed, setPressed] = useState<boolean>(false)
-    const springAnimation = useRef(new Animated.Value(1)).current;
-    const colorAnimation = useRef(new Animated.Value(0)).current;
+    const [pressed, setPressed] = useState<boolean>(status >= 1 ? true : false);
+    const springAnimation = useRef(new Animated.Value(status === 2 ? 1.2 : 1)).current;
+    const colorAnimation = useRef(new Animated.Value(status === 2 ? 1 : 0)).current;
     const backgroundColorInterpolate = colorAnimation.interpolate({
         inputRange: [0, 1],
         outputRange: ['transparent', habitColor]
     })
-    const timing: number = 100;
+    const timing: number = 50;
     const tension: number = 65;
     const friction: number = 4;
 
-    const handlePressedOut = () => {
+    const handlePressed = () => {
         if (!pressed) {
-            statsUpdate(true);
             Animated.parallel([
                 Animated.sequence([
+                    Animated.timing(springAnimation, {
+                        toValue: 0.85,
+                        duration: timing,
+                        useNativeDriver: true,
+                    }),
                     Animated.timing(springAnimation, {
                         toValue: 1.35,
                         duration: timing,
@@ -40,78 +46,60 @@ export default function HabitButton({ statsUpdate, habitColor }: props) {
                 ]),
                 Animated.timing(colorAnimation, {
                     toValue: 1,
-                    duration: timing,
+                    duration: 100,
                     useNativeDriver: true,
                 })
             ]).start();
+            statsUpdate(true);
             setPressed(true);
-
         } else {
-            statsUpdate(false);
-            Animated.parallel([
-                Animated.spring(springAnimation, {
-                    toValue: 1,
-                    friction: friction,
-                    tension: tension,
+            Animated.sequence([
+                Animated.timing(springAnimation, {
+                    toValue: 0.75,
+                    duration: timing,
                     useNativeDriver: true,
                 }),
-                Animated.timing(colorAnimation, {
-                    toValue: 0,
-                    duration: timing,
-                    useNativeDriver: true,
-                })
-            ]).start();
+                Animated.parallel([
+                    Animated.spring(springAnimation, {
+                        toValue: 1,
+                        friction: friction,
+                        tension: tension,
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(colorAnimation, {
+                        toValue: 0,
+                        duration: 100,
+                        useNativeDriver: true,
+                    })
+                ])]).start();
+            statsUpdate(false);
             setPressed(false);
         };
-    };
-    const handlePressedIn = () => {
 
-        if (pressed) {
-            Animated.spring(springAnimation, {
-                toValue: 0.85,
-                friction: friction * 1.5,
-                tension: tension * 2,
-                useNativeDriver: true,
-            }).start()
-            // Animated.timing(springAnimation, {
-            //     toValue: 0.85,
-            //     duration: 75,
-            //     useNativeDriver: true,
-            // }).start()
-        } else {
-            Animated.spring(springAnimation, {
-                toValue: 0.75,
-                friction: friction * 1.5,
-                tension: tension * 2,
-                useNativeDriver: true,
-            }).start()
-            // Animated.timing(springAnimation, {
-            //     toValue: 0.75,
-            //     duration: 75,
-            //     useNativeDriver: true,
-            // }).start()
-        }
     };
-
 
 
     return (
-
         <Pressable
-            onPressIn={handlePressedIn}
-            onPressOut={handlePressedOut}
-            style={styles.container}>
+            onPressIn={handlePressed}
+            style={styles.container}
+            disabled={status === 1 ? true : false}>
             <Animated.View
                 style={[
                     styles.checkbox,
                     {
-                        backgroundColor: backgroundColorInterpolate,
+                        justifyContent: 'center',
+                        alignContent: 'center',
+                        backgroundColor: status === 1 ? habitColor : backgroundColorInterpolate,
+                        opacity: status === 1 ? 0.50 : 1,
                         borderColor: habitColor,
                         transform: [{
-                            scale: springAnimation,
+                            scale: status === 1 ? 1.2 : springAnimation,
                         }]
                     },
-                ]} />
+                ]}>
+                {status === 1 && <Text style={{ fontSize: 12, textAlign: 'center', textAlignVertical: 'center' }}>Skip Day</Text>}
+            </Animated.View>
         </Pressable>
     );
 }
@@ -129,6 +117,5 @@ const styles = StyleSheet.create({
         height: 67.5,
         alignItems: 'center',
         justifyContent: 'center',
-
     }
 });

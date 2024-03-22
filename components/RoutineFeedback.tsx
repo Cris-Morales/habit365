@@ -8,6 +8,7 @@ export default function RoutineFeedback({ habitsComplete, totalHabits, routine_d
     const fillAnimation = useRef(new Animated.Value(0)).current; // animation that makes it look like the bubble is filling
     const [borderColor, setborderColor] = useState<string>('gray');
 
+    // optimize this animation, there is a delay in button press
     useEffect(() => {
         setBubbleProgress(100 * habitsComplete / totalHabits)
         Animated.timing(fillAnimation, {

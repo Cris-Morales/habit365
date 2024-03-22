@@ -14,7 +14,6 @@ const useJournalData = (db: SQLite.SQLiteDatabase) => {
                 const entriesInitialized = await indexQueryChecks(db);
                 if (entriesInitialized) {
                     const jouranlData: indexDataShape[] | any = await journalQuery(db);
-                    console.log('cp4: ', jouranlData);
                     setData(jouranlData);
                 } else {
                     throw new Error('No habits in the database');

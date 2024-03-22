@@ -36,7 +36,6 @@ export const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
         (SELECT COUNT(*) FROM habits WHERE habits.routine_id = routines.id) 
         AS total_habits
         FROM routines;`);
-        console.log('habit count')
 
         // On app first open, no habits => feedback
         if (habitList.length === 0) {
@@ -75,7 +74,7 @@ export const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
                 // entries exist from yesterday, initialize habit entries the easy way
                 if (getYesterdayEntries.length) {
                     for (let i = 0; i < getYesterdayEntries.length; i++) {
-                        console.log(`yesterday\'s entry index-${i}`, getYesterdayEntries[i]);
+                        // console.log(`yesterday\'s entry index-${i}`, getYesterdayEntries[i]);
 
                         await db.runAsync(`INSERT INTO habit_entries (habit_id, status, current_streak, hit_total, total_days, entry_date)
                                             VALUES (?,
@@ -138,19 +137,20 @@ export const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
         if (checkTodayRoutineEntries['COUNT(*)'] === 0) {
             // are there routine entries alread? might need to check
             for (let i = 0; i < routineList.length; i++) {
+                // console.log('routine: ', routineList[i]);
                 if (routineList[i].total_habits != 0) {
-                    console.log('routine_entries insert')
+                    // console.log('routine habits list: ', routineList[i].total_habits, 'routine ');
                     await db.runAsync(`
                         INSERT INTO routine_entries (routine_id, entry_date, habits_complete, total_habits) 
                         SELECT ?, ?, 
                         (SELECT COUNT(*) FROM habits JOIN habit_entries ON habits.id = habit_entries.habit_id WHERE routine_id = ? AND habit_entries.status = 1),
-                        (SELECT COUNT(*) FROM habits WHERE routine_id = ?)
-                        `, routineList[i].id, today, routineList[i].total_habits, routineList[i].id, routineList[i].total_habits, routineList[i].id);
+                        ?
+                        `, routineList[i].id, today, routineList[i].id, routineList[i].total_habits);
                 };
             };
         };
 
-        console.log('today\'s habit entries initialization/verification complete');
+        // console.log('today\'s habit entries initialization/verification complete');
         return true;
     } catch (error) {
         console.error('Error in Index Query: ', error);
@@ -178,13 +178,10 @@ export const journalQuery = async (db: SQLite.SQLiteDatabase) => {
         WHERE routine_entries.entry_date = ?
         `, today);
 
-        console.log('cp3: ', routineQuery);
         const journalResults: indexDataShape[] = [{
             routine_data: null,
             routine_habits: habitDataArrayNull
         },]
-
-        console.log('cp4: ', journalResults);
 
         for (const routine of routineQuery) {
             const habitDataArray: habit[] = await db.getAllAsync(`
@@ -201,14 +198,7 @@ export const journalQuery = async (db: SQLite.SQLiteDatabase) => {
                 routine_data: routine,
                 routine_habits: habitDataArray
             });
-            console.log('cp5: ', {
-                routine_data: routine,
-                routine_habits: habitDataArray
-            });
-
         }
-
-        console.log('cp6: ', journalResults);
 
         return journalResults;
     } catch (error) {

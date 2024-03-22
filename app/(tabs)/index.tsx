@@ -10,7 +10,6 @@ export default function TabOneScreen() {
 
   const journalData: indexDataShape[] | null = useJournalData(db);
 
-  console.log(journalData);
   return (
     <View style={styles.container}>
       {journalData != null ?

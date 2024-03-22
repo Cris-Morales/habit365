@@ -9,11 +9,9 @@ export default function RoutineComponent({ routine_data, routine_habits }: index
 
     // makes db query to routine entries
     // routes to routine modal
+    const [habitsComplete, setHabitsComplete] = useState<number | undefined>(routine_data?.habits_complete);
 
-    // edge cases, what happens if a habit's routine is null?
-    // just doesn't display the routine row component
-    // displays that list on top
-    const [habitsComplete, setHabitsComplete] = useState<number | undefined>(routine_data?.habits_complete)
+
     return (
         <View style={[styles.routineContainer, (routine_data != null) && { borderWidth: 1, borderColor: 'gray' }]}>
             {(routine_data != null) &&
@@ -23,9 +21,9 @@ export default function RoutineComponent({ routine_data, routine_habits }: index
                 <FlatList
                     scrollEnabled={true}
                     data={routine_habits}
-                    keyExtractor={(item) => item.title}
+                    keyExtractor={(item, index) => item.title + '-index-' + index + item.entry_id}
                     renderItem={({ item }) => {
-                        return (<HabitRow habitData={item} habitsComplete={habitsComplete} setHabitsComplete={setHabitsComplete} routineNull={routine_data === null} />)
+                        return (<HabitRow habitData={item} habitsComplete={habitsComplete} setHabitsComplete={setHabitsComplete} routineNull={routine_data === null} routineEntryId={routine_data?.entry_id} />)
                     }}
                 />
             </View>
@@ -41,7 +39,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         paddingBottom: 2.5,
         flex: 1,
-        marginVertical: 2.5
+        marginVertical: 2.5,
     },
     habitRowContainer: {
         flex: 1,

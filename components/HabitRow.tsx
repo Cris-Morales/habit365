@@ -1,19 +1,46 @@
 import { StyleSheet, Pressable, FlatList } from 'react-native';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Text, View } from '@/components/Themed';
 import { router } from 'expo-router'
 import HabitButton from '@/components/HabitButton';
+import { habit } from './types/dataTypes';
+import { useSQLiteContext } from 'expo-sqlite/next';
+import { err } from 'react-native-svg';
 
 interface listData {
     title: string;
     data: string;
 }
 
+interface props {
+    habitData: habit;
+    habitsComplete: any;
+    setHabitsComplete: any;
+    routineNull: boolean;
+    routineEntryId: number | undefined;
+}
 
-export default function HabitRow({ habitData, habitsComplete, setHabitsComplete, routineNull }: any) {
+
+
+export default function HabitRow({ habitData, habitsComplete, setHabitsComplete, routineNull, routineEntryId }: props) {
     const [currentStreak, setCurrentStreak] = useState<number>(habitData.current_streak);
     const [hitTotal, setHitTotal] = useState<number>(habitData.hit_total);
     const [perHit, setPerHit] = useState<number>(habitData.total_days ? Math.round(habitData.hit_total / habitData.total_days * 1000) / 10 : 0);
+
+    const db = useSQLiteContext();
+
+    const dbHabitEntryUpdate = async (status: boolean) => {
+        try {
+            const results = await db.runAsync(`UPDATE habit_entries SET status = ?, hit_total = ?, current_streak = ? WHERE habit_entries.id = ?;`, status ? 2 : 0, status ? habitData.hit_total + 1 : habitData.hit_total - 1, status ? habitData.current_streak + 1 : habitData.current_streak - 1, habitData.entry_id);
+            // console.log(`habit ${habitData.title} entry changed: `, results.changes);
+            if (routineEntryId) {
+                const routineEntryResults = await db.runAsync(`UPDATE routine_entries SET habits_complete = ? WHERE id = ?`, status ? habitsComplete + 1 : habitsComplete - 1, routineEntryId);
+                console.log(`routine entry (entry id: ${routineEntryId}) changed: `, routineEntryResults.changes);
+            }
+        } catch (error) {
+            console.log('error in habitEntryUpdate: ', error);
+        }
+    };
 
     const dataArray: listData[] = [
         {
@@ -48,11 +75,13 @@ export default function HabitRow({ habitData, habitsComplete, setHabitsComplete,
             setHitTotal(hitTotal + 1)
             setHabitsComplete(habitsComplete + 1)
             setPerHit(Math.round((hitTotal + 1) / habitData.total_days * 1000) / 10)
+            dbHabitEntryUpdate(isChecked);
         } else {
             setCurrentStreak(currentStreak - 1)
             setHitTotal(hitTotal - 1)
             setHabitsComplete(habitsComplete - 1)
             setPerHit(Math.round((hitTotal - 1) / habitData.total_days * 1000) / 10)
+            dbHabitEntryUpdate(isChecked);
         }
         // triggers a database update, do not update state until we receive an okay from the transaction function, ie. The Tanstack Query function. For now it's just a simple state function update.
     }
@@ -74,9 +103,9 @@ export default function HabitRow({ habitData, habitsComplete, setHabitsComplete,
             </View>
         )
     }
-
+    //routineNull &&  in container view style
     return (
-        <View style={[styles.habitView, routineNull && { borderWidth: 1, borderColor: 'gray', marginTop: 10, height: 90 }]}>
+        <View style={[styles.habitView, routineNull ? { borderWidth: 1, borderRadius: 16, borderColor: 'gray', marginTop: 10, height: 90 } : { borderTopWidth: 1, borderBottomWidth: 1, borderColor: 'gray', marginTop: 10, height: 90 }]}>
             <Pressable onLongPress={openHabitModal} style={styles.modalButton}>
                 <View style={{
                     flex: 1,
@@ -89,11 +118,10 @@ export default function HabitRow({ habitData, habitsComplete, setHabitsComplete,
                     </Text>
                 </View>
             </Pressable>
-            <HabitButton statsUpdate={statsUpdate} habitColor={habitData.color} />
+            <HabitButton statsUpdate={statsUpdate} habitColor={habitData.color} status={habitData.status} />
             <View style={{
                 marginHorizontal: 2,
-                backgroundColor: 'transparent'
-
+                backgroundColor: 'transparent',
             }}>
                 <FlatList
                     horizontal={true}
@@ -115,7 +143,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderRadius: 16,
+        // borderRadius: 16,
         paddingHorizontal: 10,
         marginHorizontal: 5,
         marginVertical: 2.5,
