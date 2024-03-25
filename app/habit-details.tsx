@@ -15,6 +15,8 @@ const todayMonth = String(todayDateObj.getMonth() + 1).padStart(2, '0');
 const todayDay = String(todayDateObj.getDate()).padStart(2, '0');
 const today = `${todayYear}-${todayMonth}-${todayDay}`;
 
+
+// need date logic mixing utc and local isnt going to work
 export default function HabitDetails() {
   const params: any = useLocalSearchParams(); // see habitParams, will not accept it as a type interface.
   const [showModal, setShowModal] = useState(false);
@@ -52,12 +54,39 @@ export default function HabitDetails() {
           habitData.frequency = frequency.map(data => data.day_name);
         }
 
-        console.log(habitData)
+        const createdAtDate = new Date(habitData.created_at);
+        const startDate = new Date(habitData.start_date);
+        const testDate = new Date();
+        // console.log(createdAtDate, startDate.toLocaleString(undefined, {
+        //   weekday: 'short',
+        //   month: 'short',
+        //   day: 'numeric',
+        //   year: 'numeric'
+        // }));
+
+        console.log('created at: ', habitData.created_at, createdAtDate.toISOString()); // local: 3/24/2024, 2:35:42 AM - which is GMT, SQL inserts | 2024-03-24T07:35:42.000Z
+        console.log('start date: ', habitData.start_date, startDate.toISOString()); // local: 3/23/2024, 7:00:00 PM idek - inserted with short date string | 2024-03-24T00:00:00.000Z - weird, it 
+        console.log('test date for this moment: ', testDate.toISOString()); // local, created this moment: 3/23/2024, 9:50:00 PM | 2024-03-24T02:54:31.096Z
+        const tDateObj = new Date();
+        const tYear = todayDateObj.getFullYear();
+        const tMonth = String(todayDateObj.getMonth() + 1).padStart(2, '0');
+        const tDay = String(todayDateObj.getDate()).padStart(2, '0');
+        const t = `${todayYear}-${todayMonth}-${todayDay}`;
+
+        // created at:  2024-03-23T10:16:05.000Z - iterally when this habit was created
+        // start date: 2024-03 - 23T00:00:00.000Z  - literally at midnight 3-23-2024 UTC
+        // test date for this moment: 2024-03 - 24T02: 26: 13.005Z - literally what UTC sql is
+
+
+        // LOG  created at: 3 / 23 / 2024
+        // LOG  start date: 3 / 22 / 2024 
+        // LOG  test date(for this moment 3 / 23 / 2024
+
+
         setHabitDetails(habitData);
         setCreatedAtDateObj(new Date(habitData.created_at));
         setStartedAtDateObj(new Date(habitData.start_date));
         setIsLoading(false);
-        console.log(habitData.title);
       } catch (error) {
         console.error('Error in Habit Details Data Query: ', error);
       }
@@ -66,8 +95,6 @@ export default function HabitDetails() {
     queryData();
 
   }, []);
-  // console.log(new Date().toUTCString());
-
 
   return (
     <View style={styles.container}>
@@ -83,17 +110,31 @@ export default function HabitDetails() {
           </View>
           <View style={styles.separator} lightColor="#eee" darkColor="gray" />
           <View style={styles.statContainer}>
-            <Text style={styles.subTitle}>Start Date: <Text style={{ fontWeight: 'bold', color: habitDetails?.color }}>{startedAtDateObj?.toLocaleDateString()}</Text></Text>
-            <Text style={styles.subTitle}>Created At: <Text style={{ fontWeight: 'bold', color: habitDetails?.color }}>{createdAtDateObj?.toLocaleDateString()}</Text></Text>
-            <Text style={styles.subTitle}>Current Streak: <Text style={{ fontWeight: 'bold', color: habitDetails?.color }}>{habitDetails?.current_streak}</Text></Text>
-            <Text style={styles.subTitle}>Total Hits: <Text style={{ fontWeight: 'bold', color: habitDetails?.color }}>
-              {habitDetails?.hit_total}</Text>
+            <Text style={styles.subTitle}>Start Date: <Text style={{ fontWeight: 'bold', color: habitDetails?.color }}>{startedAtDateObj?.toDateString()}</Text>
             </Text>
-            <Text style={styles.subTitle}>Percentage Hit Since Start Date: <Text style={{ fontWeight: 'bold', color: habitDetails?.color }}>
-              {habitDetails?.total_days ? Math.round(habitDetails?.hit_total / habitDetails?.total_days * 1000) / 10 : 0}%</Text>
+            <Text style={styles.subTitle}>Created At: <Text style={{ fontWeight: 'bold', color: habitDetails?.color }}>{createdAtDateObj?.toDateString()}</Text>
             </Text>
-            <Text style={styles.subTitle}>Longest Streak: <Text style={{ fontWeight: 'bold', color: habitDetails?.color }}>
-              {habitDetails?.longest_streak}</Text>
+            <Text style={styles.subTitle}>Current Streak:
+              <Text style={{ fontWeight: 'bold', color: habitDetails?.color }}>
+                {habitDetails?.current_streak}
+              </Text>
+            </Text>
+            <Text style={styles.subTitle}>Total Hits:
+              <Text style={{ fontWeight: 'bold', color: habitDetails?.color }}>
+                {habitDetails?.hit_total}
+              </Text>
+            </Text>
+            <Text style={styles.subTitle}>
+              Percentage Hit Since Start Date:
+              <Text style={{ fontWeight: 'bold', color: habitDetails?.color }}>
+                {habitDetails?.total_days ? Math.round(habitDetails?.hit_total / habitDetails?.total_days * 1000) / 10 : 0}%
+              </Text>
+            </Text>
+            <Text style={styles.subTitle}>
+              Longest Streak:
+              <Text style={{ fontWeight: 'bold', color: habitDetails?.color }}>
+                {habitDetails?.longest_streak}
+              </Text>
             </Text>
           </View>
 

@@ -26,7 +26,7 @@ export default function AppDatePicker({ date, setDate, weekdays }: any) {
         <View style={styles.container}>
             <Pressable style={styles.textInputForm} onPress={selectStartDate}>
                 <Text>
-                    {weekdays[date?.getDay()]}, {date?.toLocaleDateString('en-US')}
+                    {weekdays[date?.getDay()]}, {date?.toLocaleDateString()}
                 </Text>
             </Pressable>
             {show && (

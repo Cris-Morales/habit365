@@ -63,6 +63,7 @@ export const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
         habit_entries.entry_date = ?;
         `, dayIndex + 1, yesterday);
 
+        // no entries initialized today, initialize entries
         if (checkTodayEntries['COUNT(*)'] === 0) {
             const habitEntriesExist: any = await db.getFirstAsync('SELECT COUNT(*) FROM habit_entries');
             // Only would occur on dev mode. Or if somehow you would empty your journal tables, while having habits or routines
@@ -77,7 +78,8 @@ export const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
                         // console.log(`yesterday\'s entry index-${i}`, getYesterdayEntries[i]);
 
                         await db.runAsync(`INSERT INTO habit_entries (habit_id, status, current_streak, hit_total, total_days, entry_date)
-                                            VALUES (?,
+                                            VALUES (
+                                            ?,
                                             ?,
                                             ?,
                                             ?,

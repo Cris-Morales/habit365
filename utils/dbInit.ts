@@ -10,7 +10,7 @@ const dbInitScripts: any = {
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
                     color VARCHAR(16) NOT NULL, 
                     intention VARCHAR(255), 
-                    start_date DATE NOT NULL);
+                    start_date TIMESTAMP NOT NULL);
                     
                 CREATE TABLE IF NOT EXISTS habits (
                     id INTEGER PRIMARY KEY, 
@@ -43,26 +43,18 @@ const dbInitScripts: any = {
                     current_streak INTEGER NOT NULL,
                     hit_total INTEGER NOT NULL,
                     total_days INTEGER NOT NULL,
-                    entry_date DATE NOT NULL,
-                    new_streak_pr BOOLEAN,
+                    entry_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    new_streak_pr BOOLEAN DEFAULT false,
                     FOREIGN KEY (habit_id) REFERENCES habits(id));
 
                 CREATE TABLE IF NOT EXISTS routine_entries (
                     id INTEGER PRIMARY KEY,
-                    entry_date DATE NOT NULL,
+                    entry_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     total_habits integer,
                     habits_complete integer,
                     routine_id INTEGER NOT NULL,
                     FOREIGN KEY (routine_id) REFERENCES routines(id));
                     `);
-        //TESTING SOMETHING
-        //             CREATE TABLE IF NOT EXISTS routine_entries(
-        //                 id INTEGER PRIMARY KEY,
-        //                 entry_date DATE NOT NULL,
-        //                 percent_complete DECIMAL(3, 2),
-        //                 routine_id INTEGER NOT NULL,
-        //                 FOREIGN KEY(routine_id) REFERENCES routines(id));
-        // `);
 
         // await db.execAsync(`
         //         INSERT INTO habit_entries (habit_id, current_streak, entry_date, hit_total, status, total_days) VALUES (1, 1, '2024-03-01', 1, 2, 1);

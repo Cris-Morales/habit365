@@ -34,6 +34,39 @@ const yesterday = `${yesterdayYear}-${yesterdayMonth}-${yesterdayDay}`;
 // check every habit's frequency day matches date objects day
 const dayIndex = todayDateObj.getDay();
 
+
+
+// test
+// Create a new Date object with the current date and time
+let date = new Date();
+
+// Get the timestamp in milliseconds
+let timestamp = date.getTime();
+
+// Adjust the timestamp to the user's local time zone offset
+let offset = date.getTimezoneOffset(); // Get the time zone offset in minutes
+timestamp += offset * 60 * 1000; // Convert minutes to milliseconds
+
+// Convert the adjusted timestamp to seconds (suitable for SQL)
+let sqlTimestamp = Math.floor(timestamp / 1000);
+
+console.log(sqlTimestamp); // This is the SQL timestamp in seconds
+
+const yesterdayHabitData = [
+    { "current_streak": 1, "entry_date": yesterday, "habit_id": 1, "hit_total": 1, "new_streak_pr": 1, "status": 2, "total_days": 1 },
+    { "current_streak": 1, "entry_date": yesterday, "habit_id": 2, "hit_total": 1, "new_streak_pr": 1, "status": 2, "total_days": 1 },
+    { "current_streak": 0, "entry_date": yesterday, "habit_id": 3, "hit_total": 0, "new_streak_pr": 0, "status": 1, "total_days": 0 },
+    { "current_streak": 1, "entry_date": yesterday, "habit_id": 4, "hit_total": 1, "new_streak_pr": 1, "status": 2, "total_days": 1 },
+    { "current_streak": 0, "entry_date": yesterday, "habit_id": 5, "hit_total": 1, "new_streak_pr": 0, "status": 0, "total_days": 1 },
+    { "current_streak": 1, "entry_date": yesterday, "habit_id": 6, "hit_total": 1, "new_streak_pr": 1, "status": 2, "total_days": 1 },
+    { "current_streak": 0, "entry_date": yesterday, "habit_id": 7, "hit_total": 1, "new_streak_pr": 0, "status": 0, "total_days": 1 },
+    { "current_streak": 1, "entry_date": yesterday, "habit_id": 8, "hit_total": 1, "new_streak_pr": 1, "status": 2, "total_days": 1 },
+    { "current_streak": 1, "entry_date": yesterday, "habit_id": 9, "hit_total": 1, "new_streak_pr": 1, "status": 2, "total_days": 1 }]
+
+const yesterdayRoutineData = [
+    { "entry_date": yesterday, "habits_complete": 4, "routine_id": 1, "total_habits": 5 },
+    { "entry_date": yesterday, "habits_complete": 3, "routine_id": 2, "total_habits": 4 }]
+
 export default function TabThreeScreen() {
     const [data, setData] = useState<any>();
     const db = SQLite.useSQLiteContext();
@@ -156,6 +189,38 @@ export default function TabThreeScreen() {
     }
 
 
+
+
+
+    const alter2Timestamp = async () => {
+        try {
+            await db.execAsync(`ALTER TABLE `);
+            // CREATE TABLE IF NOT EXISTS routines (
+            //     start_date TIMESTAMP NOT NULL);
+            // CREATE TABLE IF NOT EXISTS habits (
+            //     start_date TIMESTAMP NOT NULL,
+            // CREATE TABLE IF NOT EXISTS habit_entries (
+            //     entry_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            //routine_entries entry_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            console.log('TABLES TO TIMESTAMP');
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const insertYesterdayEntries = async () => {
+        for (let i = 0; i < yesterdayHabitData.length; i++) {
+            await db.runAsync(`INSERT INTO habit_entries (current_streak, entry_date, habit_id, new_streak_pr, status, total_days, hit_total) VALUES (?,?,?,?,?,?,?)`, yesterdayHabitData[i].current_streak, yesterdayHabitData[i].entry_date, yesterdayHabitData[i].habit_id, yesterdayHabitData[i].new_streak_pr, yesterdayHabitData[i].status, yesterdayHabitData[i].total_days, yesterdayHabitData[i].hit_total);
+        };
+
+        for (let i = 0; i < yesterdayRoutineData.length; i++) {
+            await db.runAsync(`INSERT INTO routine_entries (entry_date, habits_complete, routine_id, total_habits) VALUES (?,?,?,?)`, yesterdayRoutineData[i].entry_date, yesterdayRoutineData[i].habits_complete, yesterdayRoutineData[i].routine_id, yesterdayRoutineData[i].total_habits);
+        }
+
+        console.log('yesterday entries inserted');
+    };
+
+
     return (
         <ScrollView style={{ flex: 1 }}>
 
@@ -185,6 +250,14 @@ export default function TabThreeScreen() {
             <Button onPress={queryIndexData} title='grab index data routine null' />
             <Button onPress={habitFrequency} title='grab habits that occur today' />
             <Button onPress={routineEntriesToday} title='grab routine entries today' />
+            <Button onPress={() => {
+                console.log('yesterday: ', yesterday, 'today: ', today, 'dayIndex: ', dayIndex, 'sqlTimestamp: ', sqlTimestamp, timestamp, date);
+            }} title={'testing timestamp'} />
+            {/* <Button onPress={() => {
+
+            }} title='alter to timestamp' />
+            <Button onPress={ } title='alter back to date' /> */}
+            <Button onPress={insertYesterdayEntries} title='insert yesterday entries' />
         </ScrollView>
     );
 }

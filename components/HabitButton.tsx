@@ -1,4 +1,4 @@
-import { StyleSheet, Pressable, Animated, GestureResponderEvent } from 'react-native';
+import { StyleSheet, Pressable, Animated } from 'react-native';
 import { Text } from './Themed';
 import { useState, useRef } from 'react';
 

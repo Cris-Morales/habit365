@@ -16,11 +16,11 @@ const weekdays: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursda
 export default function TabTwoScreen() {
   const [isEnabled, setIsEnabled] = useState(false); // false - habit, true - routine
   const [habitName, setHabitName] = useState<string | undefined>();
-  const [routineName, setRoutineName] = useState<string>('');
-  const [startDate, setStartDate] = useState<Date | undefined>(new Date()) // DATE -  passed to database in UTC format YYYY-MM-DD,
+  const [routineName, setRoutineName] = useState<string | undefined>('');
+  const [startDate, setStartDate] = useState<Date | undefined>(new Date()) // DATE -  passed to database in format YYYY-MM-DD, local to the user, to match user perception.
   const [selectedRoutine, setSelectedRoutine] = useState<number | null>(null);
   const [frequency, setFrequency] = useState<boolean[]>(Array(7).fill(true));
-  const [intention, setIntention] = useState<string | null>(null);
+  const [intention, setIntention] = useState<string>();
   const [canSubmit, setCanSubmit] = useState<boolean>(false);
   const [routineList, setRoutineList] = useState<any>([]);
   const selectedColor = useSharedValue('#75faff');
