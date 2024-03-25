@@ -1,24 +1,21 @@
-import { StyleSheet, FlatList, Pressable } from 'react-native';
+import { StyleSheet, Pressable } from 'react-native';
 import { Text } from '@/components/Themed';
-import HabitRow from '@/components/HabitRow';
-import { useState } from 'react';
 
 
 
-export default function DayButton({ index, day, skipDays, setSkipDays, color }: any) {
-    const [pressed, setPressed] = useState<boolean>(skipDays[index]);
+
+export default function DayButton({ index, day, skipDays, setSkipDays, color, tab }: any) {
 
     const handlePress = () => {
-        // const eventValue: boolean = pressed ? false : true
-        // setPressed(eventValue);
+
         const newSkipDays = [...skipDays];
         newSkipDays[index] = skipDays[index] ? false : true;
         setSkipDays(newSkipDays);
     };
 
     return (
-        <Pressable style={[styles.dayButtonsContainer, { backgroundColor: skipDays[index] ? color : 'transparent' }]} onPress={handlePress}>
-            <Text style={styles.dayButtons}>
+        <Pressable style={[styles.dayButtons, { backgroundColor: skipDays[index] ? color : 'transparent', borderColor: skipDays[index] ? 'transparent' : 'gray' }]} onPress={handlePress} disabled={tab == 'details' ? true : false}>
+            <Text style={[styles.dayButtonText, { color: skipDays[index] ? 'black' : 'white' }]}>
                 {day.charAt(0)}
             </Text>
         </Pressable>
@@ -26,57 +23,18 @@ export default function DayButton({ index, day, skipDays, setSkipDays, color }: 
 }
 
 const styles = StyleSheet.create({
-    dayButtonsContainer: {
-        margin: 5,
+    dayButtons: {
+        marginVertical: 5,
+        marginHorizontal: 2,
         padding: 5,
-        width: 30,
-        borderRadius: 15,
-        borderWidth: 1,
-        borderColor: 'gray',
+        width: 45,
+        height: 45,
+        borderRadius: 23,
         justifyContent: 'center',
         alignItems: 'center',
+        borderWidth: 1
     },
-    dayButtons: {
+    dayButtonText: {
         textAlign: 'center',
     },
-    createHabitContainer: {
-        flex: 1,
-        alignContent: 'center'
-    },
-    formTitle: {
-        marginBottom: 10,
-        fontSize: 15,
-    },
-    formContainer: {
-        marginVertical: 10,
-        paddingHorizontal: 30
-    },
-    textInputForm: {
-        borderWidth: 1,
-        borderColor: 'gray',
-        borderRadius: 10,
-        color: 'white',
-        backgroundColor: '#696969',
-        padding: 5,
-        paddingLeft: 10,
-    },
-    weekdayButton: {
-        width: '14%'
-    },
-    divider: {
-        flexDirection: 'row',
-        borderWidth: 1,
-        borderTopColor: 'gray',
-        flex: 1,
-        margin: 5
-    },
-    submitButton: {
-        flexDirection: 'row',
-        marginVertical: 10,
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: 'gray'
-    }
 });

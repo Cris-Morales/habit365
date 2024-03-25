@@ -152,7 +152,6 @@ export const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
             };
         };
 
-        // console.log('today\'s habit entries initialization/verification complete');
         return true;
     } catch (error) {
         console.error('Error in Index Query: ', error);

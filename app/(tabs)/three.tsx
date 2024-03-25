@@ -50,7 +50,6 @@ timestamp += offset * 60 * 1000; // Convert minutes to milliseconds
 // Convert the adjusted timestamp to seconds (suitable for SQL)
 let sqlTimestamp = Math.floor(timestamp / 1000);
 
-console.log(sqlTimestamp); // This is the SQL timestamp in seconds
 
 const yesterdayHabitData = [
     { "current_streak": 1, "entry_date": yesterday, "habit_id": 1, "hit_total": 1, "new_streak_pr": 1, "status": 2, "total_days": 1 },

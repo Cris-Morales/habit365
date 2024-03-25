@@ -1,13 +1,13 @@
-import { StyleSheet, FlatList } from 'react-native';
+import { StyleSheet, FlatList, AppState } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import RoutineComponent from '@/components/RoutineComponent';
 import { useSQLiteContext } from 'expo-sqlite/next';
 import useJournalData from '@/utils/useJournalData';
 import { indexDataShape } from '@/components/types/dataTypes';
+import { useEffect, useRef, useState } from 'react';
 
 export default function TabOneScreen() {
   const db = useSQLiteContext();
-
   const journalData: indexDataShape[] | null = useJournalData(db);
 
   return (

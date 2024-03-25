@@ -1,17 +1,16 @@
-import { StyleSheet, FlatList, TextInput, KeyboardAvoidingView, TouchableOpacity, Pressable } from 'react-native';
+import { StyleSheet, TextInput, KeyboardAvoidingView, TouchableOpacity, Pressable } from 'react-native';
 import { GestureHandlerRootView, ScrollView, Switch } from 'react-native-gesture-handler';
 import { useEffect, useState } from 'react';
 import { Text, View } from '@/components/Themed';
 import AppColorPicker from '@/components/AppColorPicker';
 import { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
-import DayButton from '@/components/DayButton';
 import AppDatePicker from '@/components/AppDatePicker';
 import { Picker } from '@react-native-picker/picker';
-import { router, useRouter } from 'expo-router';
+import { router } from 'expo-router';
 import tabTwoQueries from '@/utils/tabTwoQueries';
 import { useSQLiteContext } from 'expo-sqlite/next';
+import FrequencyPicker from '@/components/FrequencyPicker';
 
-const weekdays: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export default function TabTwoScreen() {
   const [isEnabled, setIsEnabled] = useState(false); // false - habit, true - routine
@@ -134,26 +133,14 @@ export default function TabTwoScreen() {
           <View style={styles.divider} />
           <View style={[styles.formContainer,]}>
             <Text style={styles.formTitle}>Start Date</Text>
-            <AppDatePicker date={startDate} setDate={setStartDate} weekdays={weekdays} />
+            <AppDatePicker date={startDate} setDate={setStartDate} />
           </View>
           {!isEnabled ? <>
             <View style={styles.divider} />
             <View style={styles.formContainer}>
               <Text style={styles.formTitle}>Frequency:</Text>
-              <View style={{ alignContent: 'center', justifyContent: 'center', alignItems: 'center' }}>
-                <FlatList
-                  horizontal={true}
-                  scrollEnabled={false}
-                  data={weekdays}
-                  keyExtractor={(item, index) => item + index}
-                  renderItem={({ item, index }) => {
-                    return (
-                      <DayButton index={index} day={item} skipDays={frequency} setSkipDays={setFrequency} color={isEnabled ? '#e17c30' : '#4fa8cc'} />
-                    )
-                  }}
-                />
-              </View>
-            </View >
+              <FrequencyPicker frequency={frequency} setFrequency={setFrequency} color={isEnabled ? '#e17c30' : '#4fa8cc'} tab={'two'} />
+            </View>
           </> : null}
           <View style={styles.divider} />
           <View style={styles.formContainer}>

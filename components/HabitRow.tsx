@@ -87,7 +87,6 @@ export default function HabitRow({ habitData, habitsComplete, setHabitsComplete,
                     UPDATE habit_entries SET new_streak_pr = true WHERE habit_entries.id = ?`, habitData.entry_id);
                 }
 
-                //
 
             } else {
                 // changing your mind or just messing around
@@ -112,9 +111,9 @@ export default function HabitRow({ habitData, habitsComplete, setHabitsComplete,
                     await db.runAsync(`
                     UPDATE habit_entries SET new_streak_pr = true WHERE habit_entries.id = ?`, habitData.entry_id);
                 }
-                //
-
             }
+
+            // Confirm database results, could probably accomplish this in singular queries
             const confirmResults: any = await db.getFirstAsync(`
                 SELECT habit_entries.current_streak, habit_entries.hit_total, habit_entries.total_days
                 FROM habit_entries
@@ -132,8 +131,6 @@ export default function HabitRow({ habitData, habitsComplete, setHabitsComplete,
             console.error('error in stats update: ', error);
 
         }
-
-        // triggers a database update, do not update state until we receive an okay from the transaction function, ie. The Tanstack Query function. For now it's just a simple state function update.
     }
 
 

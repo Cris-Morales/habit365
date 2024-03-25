@@ -4,11 +4,13 @@ import { Text, View } from '@/components/Themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { processPath } from '@shopify/react-native-skia';
+const weekdays: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
 
 
 type onChange = (event: DateTimePickerEvent, date?: Date | undefined) => void;
 
-export default function AppDatePicker({ date, setDate, weekdays }: any) {
+export default function AppDatePicker({ date, setDate }: any) {
     const [show, setShow] = useState<boolean>(false);
 
     const onChange: onChange = (event, selectedDate) => {

@@ -3,17 +3,22 @@ import { Platform, Pressable, StyleSheet, Modal } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { router } from 'expo-router';
 import { Text, View } from '@/components/Themed';
-import dummyData from '@/components/dummyData';
-import { habit, habitDetails } from '@/components/types/dataTypes';
 import { useEffect, useState } from 'react';
 import DeleteModal from '@/components/DeleteModal';
 import { useSQLiteContext } from 'expo-sqlite/next';
+import FrequencyPicker from '@/components/FrequencyPicker';
+
+interface frequency {
+  day_number: number;
+}
+
 
 const todayDateObj = new Date();
 const todayYear = todayDateObj.getFullYear();
 const todayMonth = String(todayDateObj.getMonth() + 1).padStart(2, '0');
 const todayDay = String(todayDateObj.getDate()).padStart(2, '0');
 const today = `${todayYear}-${todayMonth}-${todayDay}`;
+
 
 
 // need date logic mixing utc and local isnt going to work
@@ -42,8 +47,8 @@ export default function HabitDetails() {
                 AND
                 habit_entries.entry_date = ?`, params.id, today);
 
-        const frequency: any[] = await db.getAllAsync(`
-                SELECT days.day_name 
+        const frequency: frequency[] = await db.getAllAsync(`
+                SELECT days.day_number 
                 FROM days
                 JOIN habits_days_frequency
                 ON days.id = habits_days_frequency.day_id
@@ -51,41 +56,23 @@ export default function HabitDetails() {
                 `, params.id);
 
         if (frequency) {
-          habitData.frequency = frequency.map(data => data.day_name);
+          const frequencyArray = new Array(7).fill(false);
+          frequency.forEach(data => {
+            frequencyArray[data.day_number] = true;
+          });
+          habitData.frequency = frequencyArray;
         }
 
-        const createdAtDate = new Date(habitData.created_at);
-        const startDate = new Date(habitData.start_date);
-        const testDate = new Date();
-        // console.log(createdAtDate, startDate.toLocaleString(undefined, {
-        //   weekday: 'short',
-        //   month: 'short',
-        //   day: 'numeric',
-        //   year: 'numeric'
-        // }));
-
-        console.log('created at: ', habitData.created_at, createdAtDate.toISOString()); // local: 3/24/2024, 2:35:42 AM - which is GMT, SQL inserts | 2024-03-24T07:35:42.000Z
-        console.log('start date: ', habitData.start_date, startDate.toISOString()); // local: 3/23/2024, 7:00:00 PM idek - inserted with short date string | 2024-03-24T00:00:00.000Z - weird, it 
-        console.log('test date for this moment: ', testDate.toISOString()); // local, created this moment: 3/23/2024, 9:50:00 PM | 2024-03-24T02:54:31.096Z
-        const tDateObj = new Date();
-        const tYear = todayDateObj.getFullYear();
-        const tMonth = String(todayDateObj.getMonth() + 1).padStart(2, '0');
-        const tDay = String(todayDateObj.getDate()).padStart(2, '0');
-        const t = `${todayYear}-${todayMonth}-${todayDay}`;
-
-        // created at:  2024-03-23T10:16:05.000Z - iterally when this habit was created
-        // start date: 2024-03 - 23T00:00:00.000Z  - literally at midnight 3-23-2024 UTC
-        // test date for this moment: 2024-03 - 24T02: 26: 13.005Z - literally what UTC sql is
-
-
-        // LOG  created at: 3 / 23 / 2024
-        // LOG  start date: 3 / 22 / 2024 
-        // LOG  test date(for this moment 3 / 23 / 2024
+        const offsetHoursOperation = todayDateObj.getTimezoneOffset() / 60;
+        const offsetHours = offsetHoursOperation > 9 ? '0' + offsetHoursOperation.toString() : offsetHoursOperation;
+        const offsetMinutesMod = todayDateObj.getTimezoneOffset() % 60;
+        const offsetMinutes = offsetMinutesMod === 0 ? '00' : offsetMinutesMod;
+        const fullOffset = 'T' + offsetHours + ':' + offsetMinutes + ':00'
 
 
         setHabitDetails(habitData);
         setCreatedAtDateObj(new Date(habitData.created_at));
-        setStartedAtDateObj(new Date(habitData.start_date));
+        setStartedAtDateObj(new Date(habitData.start_date + fullOffset));
         setIsLoading(false);
       } catch (error) {
         console.error('Error in Habit Details Data Query: ', error);
@@ -137,7 +124,10 @@ export default function HabitDetails() {
               </Text>
             </Text>
           </View>
-
+          <View style={styles.statContainer}>
+            <Text style={[styles.subTitle, { fontWeight: 'bold' }]}>Frequency: </Text>
+            <FrequencyPicker frequency={habitDetails.frequency} setFrequency={null} isEnabled={false} tab={'details'} color={habitDetails.color} />
+          </View>
           <View style={styles.separator} lightColor="#eee" darkColor="gray" />
           <View style={styles.statContainer}>
             <Text style={[styles.subTitle, { fontStyle: 'italic' }]}>Calender Coming Soon!</Text>
