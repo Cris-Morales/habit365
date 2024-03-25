@@ -78,6 +78,24 @@ export default function TabThreeScreen() {
             console.error(`Error in ${action} table read: `, error)
         }
     }
+
+    const readHabitEntries = async (action: string) => {
+        try {
+            const tableRows = await db.getAllAsync(`SELECT habits.title, habit_entries.habit_id, habit_entries.id, habit_entries.entry_date, habit_entries.status, habit_entries.hit_total, habit_entries.current_streak, habit_entries.total_days FROM habit_entries JOIN habits ON habit_entries.habit_id = habits.id WHERE habit_entries.entry_date = ?`, today);
+            console.log(tableRows)
+        } catch (error) {
+            console.error(`Error in ${action} table read: `, error)
+        }
+    }
+    const readRoutineEntries = async (action: string) => {
+        try {
+            const tableRows = await db.getAllAsync(`SELECT routines.title, routine_entries.habit_id, routine_entries.id, routine_entries.entry_date, routine_entries.status, routine_entries.hit_total, routine_entries.current_streak, routine_entries.total_days FROM routine_entries JOIN routines ON routine_entries.habit_id = habits.id WHERE routine_entries.entry_date = ?`, today);
+            console.log(tableRows)
+        } catch (error) {
+            console.error(`Error in ${action} table read: `, error)
+        }
+    }
+
     const readJournalTest = async () => {
         try {
             const dateDiffQuery: any = await db.getAllAsync(`SELECT julianday(?) - julianday((SELECT MAX(entry_date) FROM habit_entries));`, today);
@@ -233,7 +251,7 @@ export default function TabThreeScreen() {
             <Button onPress={() => readTable('routines')} title='read routines table' />
             <Button onPress={() => readTable('days')} title='read days table' />
             <Button onPress={readFrequencyTable} title='read habits_days_frequency table' />
-            <Button onPress={() => readTable('habit_entries')} title='read habit_entries table' />
+            <Button onPress={() => readHabitEntries('habit_entries')} title='read habit_entries table' />
             <Button onPress={() => readTable('routine_entries')} title='read routine_entries table' />
             <Button onPress={dropDatabase} title='delete database' />
             <View style={{

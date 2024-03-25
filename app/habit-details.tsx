@@ -175,7 +175,7 @@ export default function HabitDetails() {
             onRequestClose={() => {
               setShowModal(!showModal);
             }}>
-            <DeleteModal action={'Habit'} id={params.id} showModal={showModal} setShowModal={setShowModal} />
+            <DeleteModal action={'Habit'} id={params.id} showModal={showModal} setShowModal={setShowModal} db={db} routineId={habitDetails.routine_id} today={today} />
           </Modal>
         </>}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />

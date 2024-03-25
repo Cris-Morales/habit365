@@ -4,11 +4,14 @@ import RoutineComponent from '@/components/RoutineComponent';
 import { useSQLiteContext } from 'expo-sqlite/next';
 import useJournalData from '@/utils/useJournalData';
 import { indexDataShape } from '@/components/types/dataTypes';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import { indexQueryChecks, journalQuery } from '@/utils/indexQueries';
 
 export default function TabOneScreen() {
   const db = useSQLiteContext();
   const journalData: indexDataShape[] | null = useJournalData(db);
+
 
   return (
     <View style={styles.container}>

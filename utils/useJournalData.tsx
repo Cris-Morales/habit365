@@ -7,6 +7,7 @@ import { indexDataShape } from "@/components/types/dataTypes";
 
 const useJournalData = (db: SQLite.SQLiteDatabase) => {
     const [data, setData] = useState<indexDataShape[] | null>(null);
+    console.log('useJournalData');
 
     useFocusEffect(useCallback(() => {
         const queryData = async () => {

@@ -2,26 +2,75 @@ import { useRouter } from "expo-router";
 import { View, Text } from "./Themed";
 import { StyleSheet, Pressable, Alert } from "react-native";
 import React from "react";
+import { SQLiteDatabase } from "expo-sqlite/next";
+import HabitDetails from "@/app/habit-details";
 
 
 interface props {
     action: string;
     id: number;
     showModal: boolean;
-    setShowModal: React.Dispatch<boolean>
+    setShowModal: React.Dispatch<boolean>;
+    db: SQLiteDatabase;
+    routineId: number | null;
+    today: string;
 }
 
-export default function DeleteModal({ action, id, showModal, setShowModal }: props) {
+export default function DeleteModal({ action, id, showModal, setShowModal, db, routineId, today }: props) {
     const router = useRouter()
 
     // use action and id to specify delete action.
 
-    const deleteFunction = () => {
-        // on press, need to make db transaction 
+    const deleteFunction = async () => {
+        // on press, need to make db transacti` 
         // action = 'Habit' or 'Routine', defines the tanstack function above
         // have loading screen 'deleting {habit_name} from tanstack query
+        try {
+            if (action === 'Habit') {
+                await db.execAsync(`
+                DELETE FROM habits_days_frequency WHERE habit_id = ${id};
+                DELETE FROM habit_entries WHERE habit_id = ${id};
+                DELETE FROM habits WHERE id = ${id};
+                `);
 
-        router.dismissAll() // might be the only way to route to index, while not leaving screens on the screen stack
+                if (routineId) {
+                    const totalHabits: any = await db.getFirstAsync(`SELECT COUNT(*) FROM habits WHERE routine_id = ?`, routineId);
+                    const habitsComplete: any = await db.getFirstAsync(`
+                                            SELECT COUNT(*) 
+                                                FROM habit_entries 
+                                                JOIN habits 
+                                                ON habits.id = habit_entries.habit_id 
+                                                WHERE routine_id = ?
+                                                AND habit_entries.status > 0 
+                                                AND habit_entries.entry_date = ?`, routineId, today);
+
+                    await db.runAsync(`
+                    UPDATE routine_entries 
+                    SET total_habits = ?,
+                    habits_complete = ? 
+                    WHERE routine_id = ?
+                    AND
+                    entry_date = ?;
+                    `, totalHabits['COUNT(*)'], habitsComplete['COUNT(*)'], routineId, today);
+                }
+
+            } else if (action === 'Routine') {
+                await db.execAsync(`
+                UPDATE habits SET routine_id = NULL WHERE routine_id = ${id};
+                DELETE FROM routine_entries WHERE routine_id = ${id};
+                DELETE FROM routines WHERE id = ${id};
+                `);
+            }
+
+            console.log(`${action} ${id} records deleted`)
+        } catch (error) {
+            console.error(`Error in delete ${action} ${id}: `, error);
+        }
+        router.replace(
+            {
+                pathname: '/(tabs)/'
+            }
+        )
     }
 
     return (

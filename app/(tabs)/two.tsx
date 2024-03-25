@@ -92,7 +92,6 @@ export default function TabTwoScreen() {
             <Text style={styles.switchTitle}>Habit</Text>
           </Pressable>
           <Switch
-            style={styles.switch}
             trackColor={{ false: 'white', true: 'white' }}
             thumbColor={isEnabled ? '#e17c30' : '#4fa8cc'}
             onValueChange={toggleSwitch}
@@ -200,8 +199,6 @@ const styles = StyleSheet.create({
   switchTitle: {
     textAlign: 'center',
     fontSize: 20,
-  },
-  switch: {
   },
   formTitle: {
     marginBottom: 10,
