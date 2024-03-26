@@ -85,11 +85,11 @@ export default function HabitDetails() {
 
   return (
     <View style={styles.container}>
-      {isLoading ? <>
-        <Text>
+      {isLoading ? <View style={{ justifyContent: 'center', flex: 1 }}>
+        <Text style={{ textAlignVertical: 'center', textAlign: 'center', fontSize: 20 }}>
           Loading...
         </Text>
-      </> :
+      </View> :
         <>
           <View style={styles.titleContainer}>
             <View style={[styles.habitBubble, { backgroundColor: habitDetails.color }]} />

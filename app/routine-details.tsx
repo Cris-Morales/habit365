@@ -66,11 +66,11 @@ export default function RoutineDetails() {
   }, []);
   return (
     <View style={styles.container}>
-      {isLoading ? <>
-        <Text>
+      {isLoading ? <View style={{ justifyContent: 'center', flex: 1 }}>
+        <Text style={{ textAlignVertical: 'center', textAlign: 'center', fontSize: 20 }}>
           Loading...
         </Text>
-      </> :
+      </View> :
         <>
           <View style={styles.titleContainer}>
             <View style={{ backgroundColor: routineDetails.color, width: 60, height: 60, borderRadius: 30, marginRight: 10, marginLeft: -30 }} />

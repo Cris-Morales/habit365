@@ -1,17 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { KeyboardAvoidingView, StyleSheet } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { View } from './Themed';
 
-import ColorPicker, { Panel2, OpacitySlider, BrightnessSlider, InputWidget } from 'reanimated-color-picker';
+import ColorPicker, { Panel2, OpacitySlider, BrightnessSlider, InputWidget, Preview } from 'reanimated-color-picker';
 import type { returnedResults } from 'reanimated-color-picker';
 
-export default function AppColorPicker({ selectedColor, backgroundColorStyle }: any) {
+export default function AppColorPicker({ selectedColor, backgroundColorStyle, tab }: any) {
 
     const onColorSelect = (color: returnedResults) => {
         'worklet';
         selectedColor.value = color.hex;
     };
+
 
     return (
         <Animated.View style={styles.container}>
@@ -27,7 +28,8 @@ export default function AppColorPicker({ selectedColor, backgroundColorStyle }: 
                             defaultFormat='HEX'
                             formats={['HEX']}
                             inputStyle={[{ paddingVertical: 2, borderColor: '#707070', fontSize: 16, marginLeft: 5 }, backgroundColorStyle]}
-                            iconColor='#707070' />
+                            iconColor='#707070'
+                        />
                         <Panel2 style={styles.panelStyle} thumbShape='ring' reverseVerticalChannel />
                         <BrightnessSlider style={styles.sliderStyle} />
                         <OpacitySlider style={styles.sliderStyle} />
