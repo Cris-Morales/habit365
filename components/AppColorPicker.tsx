@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
-import { KeyboardAvoidingView, StyleSheet } from 'react-native';
+import { Button, KeyboardAvoidingView, StyleSheet } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { View } from './Themed';
 
-import ColorPicker, { Panel2, OpacitySlider, BrightnessSlider, InputWidget, Preview } from 'reanimated-color-picker';
+import ColorPicker, { Panel2, OpacitySlider, BrightnessSlider, InputWidget } from 'reanimated-color-picker';
 import type { returnedResults } from 'reanimated-color-picker';
 
-export default function AppColorPicker({ selectedColor, backgroundColorStyle, tab }: any) {
+export default function AppColorPicker({ selectedColor, backgroundColorStyle }: any) {
+
 
     const onColorSelect = (color: returnedResults) => {
         'worklet';
