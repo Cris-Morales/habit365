@@ -51,7 +51,6 @@ export default function EditHabit() {
     const [selectedRoutine, setSelectedRoutine] = useState<number>();
     const [routineList, setRoutineList] = useState<any[]>([]);
 
-
     useEffect(() => {
         const queryFormData = async () => {
             try {
@@ -98,8 +97,7 @@ export default function EditHabit() {
         queryFormData();
     }, [])
 
-
-
+    // Only used here, but I want to shorten this file.
     const handleSubmit = async () => {
 
         // set isLoading to true
@@ -126,7 +124,7 @@ export default function EditHabit() {
         if (originalHabitData?.color != selectedColor.value) {
             if (selectedColor.value) {
                 console.log('updating color');
-                await db.runAsync(`UPDATE habits color = ? WHERE id = ?`, selectedColor.value, params.id);
+                await db.runAsync(`UPDATE habits SET color = ? WHERE id = ?`, selectedColor.value, params.id);
             }
         }
 
@@ -164,7 +162,7 @@ export default function EditHabit() {
                         // true: is a day: set status to 0
                         console.log('change entry status to 0 and increment total days'); // previous was a skip, but today is a day so set to 0, increment today days
 
-                        await db.runAsync(`UPDATE habit_entries SET status = 0 total_days = total_days + 1 WHERE habit_id = ? AND DATE(entry_date) = ?`, params.id, today);
+                        await db.runAsync(`UPDATE habit_entries SET status = 0, total_days = total_days + 1 WHERE habit_id = ? AND DATE(entry_date) = ?`, params.id, today);
                         // if there is a routine_id, update that routine entry
                     } else {
                         // false
@@ -172,9 +170,11 @@ export default function EditHabit() {
                         console.log('if prev status was 0 decrement total days, if it was 2 do nothing'); // To not remove the hit if the person already did the habit today but wants to change the frequency anyway
                         // or if they missed it but want to change the frequency, to not penalize their streak
                         // if there is a routine_id, update that routine entry
-                        await db.runAsync(`UPDATE habits_entries SET total_days = 
-                        CASE WHEN status = 0 THAN total_days - 1
-                        ELSE total_days END, status = 1`);
+                        const entryStatus: any = await db.getFirstAsync(`SELECT status, total_days FROM habit_entries WHERE habit_id = ? and DATE(entry_date) = ?`, params.id, today);
+
+                        console.log(entryStatus);
+
+                        await db.runAsync(`UPDATE habit_entries SET total_days = ?, status = 1 WHERE habit_id = ? AND DATE(entry_date) = ?`, entryStatus.status === 0 ? entryStatus.total_days - 1 : entryStatus.total_days, params.id, today);
                     }
 
                     // Habit Entry was changed, change its routine if it exists
@@ -277,8 +277,6 @@ export default function EditHabit() {
     }
 
     const params: any = useLocalSearchParams(); // see habitParams, will not accept it as a type 
-
-
 
     return (
         <GestureHandlerRootView style={styles.createHabitContainer}>

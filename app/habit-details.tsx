@@ -33,9 +33,10 @@ export default function HabitDetails() {
   const db = useSQLiteContext();
 
   useEffect(() => {
+    console.log('useEffect')
     const queryData = async () => {
       try {
-        !isLoading && setIsLoading(true);
+        // !isLoading && setIsLoading(true);
         const habitData: any = await db.getFirstAsync(`
                 SELECT habits.color, habits.created_at, habits.id, habits.intention, habits.longest_streak, habits.routine_id, habits.start_date, habits.title, habit_entries.current_streak, habit_entries.total_days, habit_entries.hit_total, routines.title AS routine_title
                 FROM habits 
