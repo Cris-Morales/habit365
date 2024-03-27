@@ -164,7 +164,7 @@ export default function EditHabit() {
                         // true: is a day: set status to 0
                         console.log('change entry status to 0 and increment total days'); // previous was a skip, but today is a day so set to 0, increment today days
 
-                        await db.runAsync(`UPDATE habit_entries SET status = 0 total_days = total_days + 1 WHERE habit_id = ? AND entry_date = ?`, params.id, today);
+                        await db.runAsync(`UPDATE habit_entries SET status = 0 total_days = total_days + 1 WHERE habit_id = ? AND DATE(entry_date) = ?`, params.id, today);
                         // if there is a routine_id, update that routine entry
                     } else {
                         // false
@@ -185,7 +185,7 @@ export default function EditHabit() {
                                                     ON habits.id = habit_entries.habit_id 
                                                     WHERE routine_id = ?
                                                     AND habit_entries.status > 0 
-                                                    AND habit_entries.entry_date = ?`, originalHabitData?.routine_id, today);
+                                                    AND DATE(entry_date) = ?`, originalHabitData?.routine_id, today);
 
                         await db.runAsync(`
                         UPDATE routine_entries 
@@ -193,7 +193,7 @@ export default function EditHabit() {
                         habits_complete = ? 
                         WHERE routine_id = ?
                         AND
-                        entry_date = ?;
+                        DATE(entry_date) = ?;
                         `, totalHabits['COUNT(*)'], habitsComplete['COUNT(*)'], originalHabitData?.routine_id, today);
                     }
 
@@ -219,11 +219,11 @@ export default function EditHabit() {
                                                         ON habits.id = habit_entries.habit_id 
                                                         WHERE routine_id = ?
                                                         AND habit_entries.status > 0 
-                                                        AND habit_entries.entry_date = ?`, selectedRoutine, today);
+                                                        AND DATE(entry_date) = ?`, selectedRoutine, today);
                 if (totalHabits['COUNT(*)'] === 1) {
                     // this routine now has entries, initialize its entry
-                    await db.runAsync(`INSERT INTO routine_entries (routine_id, entry_date, habits_complete, total_habits) 
-                    SELECT ?, ?, ?, 1`, selectedRoutine, today, habitsComplete['COUNT(*)'])
+                    await db.runAsync(`INSERT INTO routine_entries (routine_id, habits_complete, total_habits) 
+                    SELECT ?, ?, 1`, selectedRoutine, habitsComplete['COUNT(*)']);
                 } else {
                     await db.runAsync(`
                                 UPDATE routine_entries 
@@ -231,7 +231,7 @@ export default function EditHabit() {
                                 habits_complete = ? 
                                 WHERE routine_id = ?
                                 AND
-                                entry_date = ?;
+                                DATE(entry_date) = ?;
                                 `, totalHabits['COUNT(*)'], habitsComplete['COUNT(*)'], selectedRoutine, today);
                 }
             } else {
@@ -251,9 +251,9 @@ export default function EditHabit() {
                                                     ON habits.id = habit_entries.habit_id 
                                                     WHERE routine_id = ?
                                                     AND habit_entries.status > 0 
-                                                    AND habit_entries.entry_date = ?`, originalHabitData?.routine_id, today);
+                                                    AND DATE(entry_date) = ?`, originalHabitData?.routine_id, today);
                 if (oldTotalHabits['COUNT(*)'] === 0) {
-                    await db.runAsync(`DELETE FROM routine_entries WHERE routine_id = ? AND entry_date = ?`, originalHabitData.routine_id, today)
+                    await db.runAsync(`DELETE FROM routine_entries WHERE routine_id = ? AND DATE(entry_date) = ?`, originalHabitData.routine_id, today)
                 } else {
                     await db.runAsync(`
                         UPDATE routine_entries 
@@ -261,7 +261,7 @@ export default function EditHabit() {
                         habits_complete = ? 
                         WHERE routine_id = ?
                         AND
-                        entry_date = ?;
+                        DATE(entry_date) = ?;
                         `, oldTotalHabits['COUNT(*)'], oldHabitsComplete['COUNT(*)'], originalHabitData?.routine_id, today);
                 }
             }
