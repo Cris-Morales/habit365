@@ -206,6 +206,7 @@ export default function EditHabit() {
         // did the routine change?
         if (originalHabitData?.routine_id != selectedRoutine) {
             // was old routine null
+            console.log('update new routine entry');
 
             if (selectedRoutine) {
                 // new routine is not null
@@ -219,15 +220,20 @@ export default function EditHabit() {
                                                         WHERE routine_id = ?
                                                         AND habit_entries.status > 0 
                                                         AND habit_entries.entry_date = ?`, selectedRoutine, today);
-
-                await db.runAsync(`
-                            UPDATE routine_entries 
-                            SET total_habits = ?,
-                            habits_complete = ? 
-                            WHERE routine_id = ?
-                            AND
-                            entry_date = ?;
-                            `, totalHabits['COUNT(*)'], habitsComplete['COUNT(*)'], selectedRoutine, today);
+                if (totalHabits['COUNT(*)'] === 1) {
+                    // this routine now has entries, initialize its entry
+                    await db.runAsync(`INSERT INTO routine_entries (routine_id, entry_date, habits_complete, total_habits) 
+                    SELECT ?, ?, ?, 1`, selectedRoutine, today, habitsComplete['COUNT(*)'])
+                } else {
+                    await db.runAsync(`
+                                UPDATE routine_entries 
+                                SET total_habits = ?,
+                                habits_complete = ? 
+                                WHERE routine_id = ?
+                                AND
+                                entry_date = ?;
+                                `, totalHabits['COUNT(*)'], habitsComplete['COUNT(*)'], selectedRoutine, today);
+                }
             } else {
                 // new routine is null
                 await db.runAsync(`UPDATE habits SET routine_id = NULL WHERE id = ?;`, params.id);
@@ -246,21 +252,22 @@ export default function EditHabit() {
                                                     WHERE routine_id = ?
                                                     AND habit_entries.status > 0 
                                                     AND habit_entries.entry_date = ?`, originalHabitData?.routine_id, today);
-                await db.runAsync(`
-                    UPDATE routine_entries 
-                    SET total_habits = ?,
-                    habits_complete = ? 
-                    WHERE routine_id = ?
-                    AND
-                    entry_date = ?;
-                    `, oldTotalHabits['COUNT(*)'], oldHabitsComplete['COUNT(*)'], originalHabitData?.routine_id, today);
+                if (oldTotalHabits['COUNT(*)'] === 0) {
+                    await db.runAsync(`DELETE FROM routine_entries WHERE routine_id = ? AND entry_date = ?`, originalHabitData.routine_id, today)
+                } else {
+                    await db.runAsync(`
+                        UPDATE routine_entries 
+                        SET total_habits = ?,
+                        habits_complete = ? 
+                        WHERE routine_id = ?
+                        AND
+                        entry_date = ?;
+                        `, oldTotalHabits['COUNT(*)'], oldHabitsComplete['COUNT(*)'], originalHabitData?.routine_id, today);
+                }
             }
-
-            console.log('update new routine entry');
         }
 
         console.log('update complete');
-
         // reroute to home, and refetch
         router.replace(
             {
