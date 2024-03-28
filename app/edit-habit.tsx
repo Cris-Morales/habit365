@@ -103,27 +103,27 @@ export default function EditHabit() {
         // set isLoading to true
         const possibleNewDate: string = (startDate?.getFullYear() + '-' + String(startDate?.getMonth() + 1).padStart(2, '0') + '-' + String(startDate?.getDate()).padStart(2, '0'));
 
-        console.log(habitName, startDate, skipDays, selectedColor.value, 'intention: ', intention, selectedRoutine)
-        console.log(originalHabitData);
+        // console.log(habitName, startDate, skipDays, selectedColor.value, 'intention: ', intention, selectedRoutine)
+        // console.log(originalHabitData);
 
         // update habit name
         if (habitName != originalHabitData?.title) {
             if (habitName) {
-                console.log('updating name');
+                console.log('habit updating name');
                 await db.runAsync(`UPDATE habits SET title = ? WHERE id = ?`, habitName, params.id);
             }
         }
 
         // update start date (changes when stats are recieved);
         if (originalHabitData?.start_date != possibleNewDate) {
-            console.log('updating date');
+            console.log('habit updating date');
             await db.runAsync(`UPDATE habits SET start_date = ? WHERE id = ?`, possibleNewDate, params.id);
 
         }
 
         if (originalHabitData?.color != selectedColor.value) {
             if (selectedColor.value) {
-                console.log('updating color');
+                console.log('habit updating color');
                 await db.runAsync(`UPDATE habits SET color = ? WHERE id = ?`, selectedColor.value, params.id);
             }
         }
@@ -131,7 +131,7 @@ export default function EditHabit() {
         // update intention
         if ((originalHabitData?.intention ? originalHabitData?.intention : '') != intention) {
             if (intention) {
-                console.log('updating intention');
+                console.log('habit updating intention');
                 await db.runAsync(`UPDATE habits SET intention = ? WHERE id = ?`, intention, params.id);
             }
 
@@ -206,7 +206,7 @@ export default function EditHabit() {
         // did the routine change?
         if (originalHabitData?.routine_id != selectedRoutine) {
             // was old routine null
-            console.log('update new routine entry');
+            console.log('habit update new routine entry');
 
             if (selectedRoutine) {
                 // new routine is not null
@@ -267,7 +267,7 @@ export default function EditHabit() {
             }
         }
 
-        console.log('update complete');
+        console.log('habit update complete');
         // reroute to home, and refetch
         router.replace(
             {
@@ -370,22 +370,6 @@ const styles = StyleSheet.create({
     createHabitContainer: {
         flex: 1,
         alignContent: 'center',
-    },
-    editIcon: {
-        margin: 10
-    },
-    switchTitleContainer: {
-        margin: 10,
-        justifyContent: 'center',
-        borderRadius: 10,
-        padding: 5,
-        width: '30%',
-    },
-    switchTitle: {
-        textAlign: 'center',
-        fontSize: 20,
-    },
-    switch: {
     },
     formTitle: {
         marginBottom: 10,

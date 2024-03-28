@@ -1,10 +1,9 @@
-import { StyleSheet, FlatList, AppState, Pressable } from 'react-native';
+import { StyleSheet, FlatList, Pressable } from 'react-native';
 import { View, Text } from '@/components/Themed';
 import RoutineComponent from '@/components/RoutineComponent';
 import { useSQLiteContext } from 'expo-sqlite/next';
 import useJournalData from '@/utils/useJournalData';
 import { indexDataShape } from '@/components/types/dataTypes';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { AntDesign } from '@expo/vector-icons';
 const weekdays: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const todayDateObj = new Date();
@@ -13,15 +12,6 @@ const todayDateObj = new Date();
 export default function TabOneScreen() {
   const db = useSQLiteContext();
   const journalData: indexDataShape[] | null = useJournalData(db);
-
-  useEffect(() => {
-    const getAllEntryDates = async () => {
-      const results = await db.getAllAsync(`SELECT DISTINCT entry_date FROM habit_entries ORDER BY entry_date DESC;`)
-      console.log(results);
-    }
-
-    getAllEntryDates();
-  }, [])
 
   return (
     <View style={styles.container}>
