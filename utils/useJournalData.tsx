@@ -5,7 +5,7 @@ import SQLite from 'expo-sqlite/next'
 import { indexDataShape } from "@/components/types/dataTypes";
 
 
-const useJournalData = (db: SQLite.SQLiteDatabase) => {
+const useJournalData = (db: SQLite.SQLiteDatabase, journalPage: number) => {
     const [data, setData] = useState<indexDataShape[] | null>(null);
     console.log('useJournalData');
 
@@ -14,7 +14,7 @@ const useJournalData = (db: SQLite.SQLiteDatabase) => {
             try {
                 const entriesInitialized = await indexQueryChecks(db);
                 if (entriesInitialized) {
-                    const jouranlData: indexDataShape[] | any = await journalQuery(db);
+                    const jouranlData: indexDataShape[] | any = await journalQuery(db, journalPage);
                     setData(jouranlData);
                 } else {
                     console.log('No habits in the database');
@@ -26,7 +26,7 @@ const useJournalData = (db: SQLite.SQLiteDatabase) => {
         }
 
         queryData();
-    }, []));
+    }, [journalPage]));
 
     return data;
 }

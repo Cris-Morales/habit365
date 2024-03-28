@@ -159,25 +159,28 @@ export const indexQueryChecks = async (db: SQLite.SQLiteDatabase) => {
     }
 };
 
-export const journalQuery = async (db: SQLite.SQLiteDatabase) => {
+export const journalQuery = async (db: SQLite.SQLiteDatabase, journalPage: number) => {
+
+    const journalDate: any = await db.getFirstAsync(`SELECT DISTINCT entry_date FROM habit_entries ORDER BY entry_date DESC LIMIT 1 OFFSET ?;`, journalPage);
+    console.log(journalPage);
     try {
         const habitDataArrayNull: habit[] = await db.getAllAsync(`
         SELECT habits.id, habits.title, habits.color, habits.longest_streak, habit_entries.status, habit_entries.current_streak, habit_entries.total_days, habit_entries.hit_total, habit_entries.id AS entry_id 
         FROM habits
         JOIN habit_entries
         ON habits.id = habit_entries.habit_id
-        WHERE habit_entries.entry_date = ?
+        WHERE DATE(entry_date) = ?
         AND
         habits.routine_id IS NULL;
-        `, today);
+        `, journalDate.entry_date);
 
         const routineQuery: routine[] = await db.getAllAsync(`
         SELECT routines.id, routines.title, routines.color, routine_entries.total_habits, routine_entries.habits_complete, routine_entries.id AS entry_id
         FROM routine_entries
         JOIN routines
         ON routine_entries.routine_id = routines.id
-        WHERE routine_entries.entry_date = ?
-        `, today);
+        WHERE DATE(entry_date) = ?
+        `, journalDate.entry_date);
 
         const journalResults: indexDataShape[] = [{
             routine_data: null,
@@ -190,10 +193,10 @@ export const journalQuery = async (db: SQLite.SQLiteDatabase) => {
             FROM habits
             JOIN habit_entries
             ON habits.id = habit_entries.habit_id
-            WHERE habit_entries.entry_date = ?
+            WHERE DATE(entry_date) = ?
             AND
             habits.routine_id = ?; 
-            `, today, routine.id);
+            `, journalDate.entry_date, routine.id);
             // refresh
             journalResults.push({
                 routine_data: routine,
