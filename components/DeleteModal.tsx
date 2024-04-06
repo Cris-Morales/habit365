@@ -26,6 +26,9 @@ export default function DeleteModal({ action, id, showModal, setShowModal, db, r
         // action = 'Habit' or 'Routine', defines the tanstack function above
         // have loading screen 'deleting {habit_name} from tanstack query
         try {
+            const todayIdQuery: any = await db.getFirstAsync(`SELECT id FROM entry_date_storage WHERE date = ?`, today);
+            const todayId: number = todayIdQuery.id;
+
             if (action === 'Habit') {
                 await db.execAsync(`
                 DELETE FROM habits_days_frequency WHERE habit_id = ${id};
@@ -42,7 +45,7 @@ export default function DeleteModal({ action, id, showModal, setShowModal, db, r
                                                 ON habits.id = habit_entries.habit_id 
                                                 WHERE routine_id = ?
                                                 AND habit_entries.status > 0 
-                                                AND habit_entries.entry_date = ?`, routineId, today);
+                                                AND habit_entries.entry_date_id = ?`, routineId, todayId);
 
                     await db.runAsync(`
                     UPDATE routine_entries 
@@ -50,8 +53,8 @@ export default function DeleteModal({ action, id, showModal, setShowModal, db, r
                     habits_complete = ? 
                     WHERE routine_id = ?
                     AND
-                    entry_date = ?;
-                    `, totalHabits['COUNT(*)'], habitsComplete['COUNT(*)'], routineId, today);
+                    entry_date_id = ?;
+                    `, totalHabits['COUNT(*)'], habitsComplete['COUNT(*)'], routineId, todayId);
                 }
 
             } else if (action === 'Routine') {

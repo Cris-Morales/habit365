@@ -1,52 +1,58 @@
 import { StyleSheet, FlatList, Pressable } from 'react-native';
 import { View, Text } from '@/components/Themed';
-import RoutineComponent from '@/components/RoutineComponent';
 import { useSQLiteContext } from 'expo-sqlite/next';
-import useJournalData from '@/utils/useJournalData';
-import { indexDataShape } from '@/components/types/dataTypes';
 import { AntDesign } from '@expo/vector-icons';
+import useDateEntriesLength from '@/utils/useDateEntriesLength';
+import React, { useEffect, useState } from 'react';
+import Journal from '@/components/Journal';
 const weekdays: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const todayDateObj = new Date();
-
+const offsetHoursOperation = todayDateObj.getTimezoneOffset() / 60;
+const offsetHours = offsetHoursOperation > 9 ? '0' + offsetHoursOperation.toString() : offsetHoursOperation;
+const offsetMinutesMod = todayDateObj.getTimezoneOffset() % 60;
+const offsetMinutes = offsetMinutesMod === 0 ? '00' : offsetMinutesMod;
+const fullOffset = 'T' + offsetHours + ':' + offsetMinutes + ':00'
 
 export default function TabOneScreen() {
+  const [journalPage, setJournalPage] = useState<number>(0);
+  const [date, setDate] = useState<Date | null>(null);
   const db = useSQLiteContext();
-  const journalData: indexDataShape[] | null = useJournalData(db);
+  const dateLength = useDateEntriesLength(db);
+
+  useEffect(() => {
+    const queryData = async () => {
+      try {
+        const journalDate: any = await db.getFirstAsync(`SELECT DISTINCT date FROM entry_date_storage ORDER BY date DESC LIMIT 1 OFFSET ?;`, journalPage);
+        if (journalDate.date) {
+          setDate(new Date(journalDate.date + fullOffset));
+        } else {
+          console.log('no entries for this date index');
+        }
+      } catch (error) {
+        console.error('Error in Journal Data Query: ', error);
+      }
+    }
+
+    // console.log(journalPage);
+    queryData();
+  }, [journalPage])
+
 
   return (
     <View style={styles.container}>
-      {journalData != null ?
-        <>
-          <View style={{ borderBottomWidth: 1, borderBottomColor: 'gray', height: '7%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Pressable>
-              <AntDesign size={25} style={{ marginHorizontal: 5 }} name="left" color='white' />
-            </Pressable>
-            <Text style={{ fontSize: 16 }}>{weekdays[todayDateObj.getDay()]}, {todayDateObj.toLocaleDateString()}</Text>
-            <Pressable>
-              <AntDesign size={25} style={{ marginHorizontal: 5 }} name="right" color='white' />
-            </Pressable>
-          </View>
-          <FlatList
-            scrollEnabled={true}
-            data={journalData}
-            keyExtractor={(item, index) => {
-              return (item.routine_data ? item.routine_data.title : 'undefined' + index)
-            }}
-            renderItem={({ item }) => {
-              return (
-                < RoutineComponent routine_data={item.routine_data} routine_habits={item.routine_habits} />
-              )
-            }}
-          />
-        </>
-        :
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text style={{ textAlign: 'center', textAlignVertical: 'center', fontSize: 24 }}>
-            No Habits In the Database
-          </Text>
-        </View>}
+      <View style={{ borderBottomWidth: 1, borderBottomColor: 'gray', height: '7%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Pressable onPress={() => (journalPage + 1) != dateLength && setJournalPage(journalPage + 1)}>
+          <AntDesign size={25} style={{ marginHorizontal: 5 }} name="left" color='white' />
+        </Pressable>
+        {date && dateLength ?
+          <Text style={{ fontSize: 16 }}>{weekdays[date?.getDay()]}, {date?.toLocaleDateString()}</Text>
+          : <Text>No Date</Text>}
+        <Pressable onPress={() => journalPage != 0 && setJournalPage(journalPage - 1)}>
+          <AntDesign size={25} style={{ marginHorizontal: 5 }} name="right" color='white' />
+        </Pressable>
+      </View>
+      <Journal db={db} journalPage={journalPage} />
     </View >
-
   );
 }
 

@@ -97,7 +97,7 @@ export default function EditRoutine() {
 
         console.log('routine update complete');
         // reroute to home, and refetch
-        router.replace(
+        router.navigate(
             {
                 pathname: '/(tabs)/'
             }

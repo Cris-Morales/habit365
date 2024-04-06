@@ -30,6 +30,9 @@ export default function RoutineDetails() {
     const queryData = async () => {
       try {
         !isLoading && setIsLoading(true);
+        const todayIdQuery: any = await db.getFirstAsync(`SELECT id FROM entry_date_storage WHERE date = ?`, today);
+        const todayId: number = todayIdQuery.id;
+
         const routineData: any = await db.getFirstAsync(`
                 SELECT routines.color, routines.created_at, routines.id, routines.intention, routines.id, routines.start_date, routines.title, routine_entries.habits_complete, routine_entries.total_habits
                 FROM routines 
@@ -37,7 +40,7 @@ export default function RoutineDetails() {
                 ON routines.id = routine_entries.routine_id
                 WHERE routines.id = ?
                 AND
-                routine_entries.entry_date = ?`, params.id, today);
+                routine_entries.entry_date_id = ?`, params.id, todayId);
 
         const offsetHoursOperation = todayDateObj.getTimezoneOffset() / 60;
         const offsetHours = offsetHoursOperation > 9 ? '0' + offsetHoursOperation.toString() : offsetHoursOperation;
@@ -45,13 +48,9 @@ export default function RoutineDetails() {
         const offsetMinutes = offsetMinutesMod === 0 ? '00' : offsetMinutesMod;
         const fullOffset = 'T' + offsetHours + ':' + offsetMinutes + ':00'
 
-
         const averageCompletion: any = await db.getFirstAsync(`SELECT (SUM(habits_complete) * 1.0 / SUM(total_habits)) AS [Avg_Completion_Rate] FROM routine_entries WHERE routine_id = ?`, params.id);
         routineData.average_completion_rate = averageCompletion['Avg_Completion_Rate']
 
-
-
-        console.log(routineData)
         setRoutineDetails(routineData);
         setCreatedAtDateObj(new Date(routineData.created_at));
         setStartedAtDateObj(new Date(routineData.start_date + fullOffset));
@@ -81,12 +80,7 @@ export default function RoutineDetails() {
             <Text style={styles.subTitle}>Start Date: <Text style={{ fontWeight: 'bold', color: routineDetails.color }}>{startedAtDateObj?.toLocaleDateString()}</Text></Text>
             <Text style={styles.subTitle}>Created At: <Text style={{ fontWeight: 'bold', color: routineDetails.color }}>{createdAtDateObj?.toLocaleDateString()}</Text></Text>
             <Text style={styles.subTitle}>Today's Habits Complete: <Text style={{ fontWeight: 'bold', color: routineDetails.color }}>{routineDetails.habits_complete} / {routineDetails.total_habits}</Text></Text>
-            <Text style={styles.subTitle}>Average Completion Rate: <Text style={{ fontWeight: 'bold', color: routineDetails.color }}>{routineDetails.average_completion_rate * 100}%</Text></Text>
-          </View>
-
-          <View style={styles.separator} lightColor="#eee" darkColor="gray" />
-          <View style={styles.statContainer}>
-            <Text style={[styles.subTitle, { fontStyle: 'italic' }]}>Calender Coming Soon!</Text>
+            <Text style={styles.subTitle}>Average Completion Rate: <Text style={{ fontWeight: 'bold', color: routineDetails.color }}>{Math.round(routineDetails.average_completion_rate * 1000) / 10}%</Text></Text>
           </View>
           <View style={styles.separator} lightColor="#eee" darkColor="gray" />
           <View style={styles.statContainer}>

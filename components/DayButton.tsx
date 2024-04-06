@@ -4,13 +4,19 @@ import { Text } from '@/components/Themed';
 
 
 
-export default function DayButton({ index, day, skipDays, setSkipDays, color, tab }: any) {
+export default function DayButton({ index, day, skipDays, setSkipDays, color, tab, forbiddenIndex, setShowModal }: any) {
 
     const handlePress = () => {
+        // console.log(index, forbiddenIndex)
 
-        const newSkipDays = [...skipDays];
-        newSkipDays[index] = skipDays[index] ? false : true;
-        setSkipDays(newSkipDays);
+        if (forbiddenIndex === index) {
+            setShowModal(true);
+        } else {
+
+            const newSkipDays = [...skipDays];
+            newSkipDays[index] = skipDays[index] ? false : true;
+            setSkipDays(newSkipDays);
+        }
     };
 
     return (

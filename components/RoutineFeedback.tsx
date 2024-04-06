@@ -1,14 +1,13 @@
-import { StyleSheet, Pressable, FlatList, Button, Animated } from 'react-native';
+import { StyleSheet, Animated } from 'react-native';
 import { useState, useRef, useEffect } from 'react';
-import { Text, View } from '@/components/Themed';
-import Svg, { Circle, Rect } from 'react-native-svg';
+import { View } from '@/components/Themed';
+import Svg, { Circle } from 'react-native-svg';
 
 export default function RoutineFeedback({ habitsComplete, totalHabits, routine_data }: any) {
     const [bubbleProgress, setBubbleProgress] = useState<number>(100 * habitsComplete / totalHabits) // as this moves to 50, the bubble moves closer to full
-    const fillAnimation = useRef(new Animated.Value(0)).current; // animation that makes it look like the bubble is filling
+    const fillAnimation: any = useRef(new Animated.Value(0)).current; // animation that makes it look like the bubble is filling
     const [borderColor, setborderColor] = useState<string>('gray');
 
-    // optimize this animation, there is a delay in button press
     useEffect(() => {
         setBubbleProgress(100 * habitsComplete / totalHabits)
         Animated.timing(fillAnimation, {

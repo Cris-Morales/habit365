@@ -38,3 +38,38 @@ export interface indexDataShape {
     routine_data: routine | null;
     routine_habits: habit[];
 }
+
+export interface habitGridBubbles {
+    id: number;
+    title: string;
+    type: string;
+    status: number;
+    entry_date_id: number;
+    color: string;
+}
+export interface habitGridStats {
+    entries_array: habitGridBubbles[]
+}
+
+export interface routineGridBubbles {
+    title: string;
+    id: number;
+    type: string;
+    habits_complete: number;
+    total_habits: number;
+    entry_date_id: number;
+    color: string;
+}
+
+export interface routineGridStats {
+    entries_array: routineGridBubbles[];
+}
+
+export interface gridDataShape {
+    routineGridStats: routineGridStats | null;
+    habitArray: habitGridStats[]
+}
+
+export interface gridColumn {
+    [date: string]: habitGridBubbles | routineGridBubbles;
+}

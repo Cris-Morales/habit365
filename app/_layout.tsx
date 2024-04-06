@@ -56,7 +56,7 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <SQLiteProvider databaseName="habit365.db">
+      <SQLiteProvider databaseName="habit365-2.0.db">
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false, navigationBarHidden: false }} />
           <Stack.Screen name="habit-details" options={{

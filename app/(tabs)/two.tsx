@@ -66,15 +66,21 @@ export default function TabTwoScreen() {
       try {
         if (action === 'routine') {
           await tabTwoQueries.insertRoutine(db, routineName, startDate?.toISOString().split('T')[0], selectedColor.value, intention);
+          resetForm();
+          router.replace(
+            {
+              pathname: '/(tabs)/two'
+            }
+          )
         } else if (action === 'habit') {
           await tabTwoQueries.insertHabit(db, habitName, startDate?.toISOString().split('T')[0], selectedColor.value, intention, selectedRoutine, frequency);
+          resetForm();
+          router.replace(
+            {
+              pathname: '/(tabs)/'
+            }
+          )
         }
-        resetForm();
-        router.replace(
-          {
-            pathname: '/(tabs)/'
-          }
-        )
       } catch (error) {
         console.error(error);
       }

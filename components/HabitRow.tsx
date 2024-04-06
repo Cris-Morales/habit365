@@ -1,4 +1,4 @@
-import { StyleSheet, Pressable, FlatList } from 'react-native';
+import { StyleSheet, Pressable } from 'react-native';
 import React, { useState } from 'react';
 import { Text, View } from '@/components/Themed';
 import { router } from 'expo-router'
@@ -18,31 +18,17 @@ interface props {
     setHabitsComplete: any;
     routineNull: boolean;
     routineEntryId: number | undefined;
+    journalPage: number;
 }
 
 
 
-export default function HabitRow({ habitData, habitsComplete, setHabitsComplete, routineNull, routineEntryId }: props) {
+export default function HabitRow({ habitData, setHabitsComplete, routineNull, routineEntryId, journalPage }: props) {
     const [currentStreak, setCurrentStreak] = useState<number>(habitData.current_streak);
     const [hitTotal, setHitTotal] = useState<number>(habitData.hit_total);
-    const [perHit, setPerHit] = useState<number>(habitData.total_days ? Math.round(habitData.hit_total / habitData.total_days * 1000) / 10 : 0);
 
     const db = useSQLiteContext();
 
-    const dataArray: listData[] = [
-        {
-            title: 'Hit Rate',
-            data: `${perHit}%`
-        },
-        {
-            title: 'Streak',
-            data: `${currentStreak}`
-        },
-        {
-            title: 'Total',
-            data: `${hitTotal} / ${habitData.total_days}`
-        }
-    ]
 
     const openHabitModal = () => {
         router.navigate(
@@ -109,7 +95,7 @@ export default function HabitRow({ habitData, habitsComplete, setHabitsComplete,
 
                 if (wasPr.new_streak_pr) {
                     await db.runAsync(`
-                    UPDATE habit_entries SET new_streak_pr = true WHERE habit_entries.id = ?`, habitData.entry_id);
+                    UPDATE habit_entries SET new_streak_pr = false WHERE habit_entries.id = ?`, habitData.entry_id);
                 }
             }
 
@@ -126,32 +112,12 @@ export default function HabitRow({ habitData, habitsComplete, setHabitsComplete,
 
             setCurrentStreak(confirmResults.current_streak);
             setHitTotal(confirmResults.hit_total);
-            setPerHit(Math.round((confirmResults.hit_total) / confirmResults.total_days * 1000) / 10);
         } catch (error) {
             console.error('error in stats update: ', error);
 
         }
     }
 
-
-    const HabitData = ({ item }: { item: listData }) => {
-        return (
-            <View style={styles.habitStats}>
-                <Text>
-                    {item.title}
-                </Text>
-                <Text style={{
-                    fontWeight: 'bold',
-                    color: habitData.color,
-                    backgroundColor: 'transparent'
-
-                }}>
-                    {item.data}
-                </Text>
-            </View>
-        )
-    }
-    //routineNull &&  in container view style
     return (
         <View style={[styles.habitView, routineNull ? { borderWidth: 1, borderRadius: 16, borderColor: 'gray', marginTop: 10, height: 90 } : { borderTopWidth: 1, borderBottomWidth: 1, borderColor: 'gray', marginTop: 10, height: 90 }]}>
             <Pressable onLongPress={openHabitModal} style={styles.modalButton}>
@@ -166,19 +132,51 @@ export default function HabitRow({ habitData, habitsComplete, setHabitsComplete,
                     </Text>
                 </View>
             </Pressable>
-            <HabitButton statsUpdate={statsUpdate} habitColor={habitData.color} status={habitData.status} />
+            <HabitButton statsUpdate={statsUpdate} habitColor={habitData.color} status={habitData.status} journalPage={journalPage} />
             <View style={{
                 marginHorizontal: 2,
                 backgroundColor: 'transparent',
+                flexDirection: 'row'
             }}>
-                <FlatList
-                    horizontal={true}
-                    scrollEnabled={false}
-                    data={dataArray}
-                    keyExtractor={item => item.title}
-                    renderItem={HabitData}
-                    ListFooterComponentStyle={styles.statsContainer}
-                />
+                <View style={styles.habitStats}>
+                    <Text>
+                        Hit Rate
+                    </Text>
+                    <Text style={{
+                        fontWeight: 'bold',
+                        color: habitData.color,
+                        backgroundColor: 'transparent'
+
+                    }}>
+                        {habitData.total_days ? Math.round(hitTotal / habitData.total_days * 1000) / 10 : 0}%
+                    </Text>
+                </View>
+                <View style={styles.habitStats}>
+                    <Text>
+                        Streak
+                    </Text>
+                    <Text style={{
+                        fontWeight: 'bold',
+                        color: habitData.color,
+                        backgroundColor: 'transparent'
+
+                    }}>
+                        {currentStreak}
+                    </Text>
+                </View>
+                <View style={styles.habitStats}>
+                    <Text>
+                        Total
+                    </Text>
+                    <Text style={{
+                        fontWeight: 'bold',
+                        color: habitData.color,
+                        backgroundColor: 'transparent'
+
+                    }}>
+                        {hitTotal} / {habitData.total_days}
+                    </Text>
+                </View>
             </View>
         </View>
     );

@@ -1,11 +1,10 @@
-import { StyleSheet, FlatList, SectionList } from 'react-native';
+import { StyleSheet, FlatList } from 'react-native';
 import { useState } from 'react';
-import { View, Text } from '@/components/Themed';
+import { View } from '@/components/Themed';
 import RoutineHeader from './RoutineHeader';
 import HabitRow from './HabitRow';
-import { routine, habit, indexDataShape } from './types/dataTypes';
 
-export default function RoutineComponent({ routine_data, routine_habits }: indexDataShape) {
+export default function RoutineComponent({ routine_data, routine_habits, journalPage }: any) {
 
     // makes db query to routine entries
     // routes to routine modal
@@ -23,7 +22,7 @@ export default function RoutineComponent({ routine_data, routine_habits }: index
                     data={routine_habits}
                     keyExtractor={(item, index) => item.title + '-index-' + index + item.entry_id}
                     renderItem={({ item }) => {
-                        return (<HabitRow habitData={item} habitsComplete={habitsComplete} setHabitsComplete={setHabitsComplete} routineNull={routine_data === null} routineEntryId={routine_data?.entry_id} />)
+                        return (<HabitRow habitData={item} habitsComplete={habitsComplete} setHabitsComplete={setHabitsComplete} routineNull={routine_data === null} journalPage={journalPage} routineEntryId={routine_data?.entry_id} />)
                     }}
                 />
             </View>

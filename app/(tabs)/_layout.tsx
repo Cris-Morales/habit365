@@ -1,5 +1,5 @@
 import React from 'react';
-import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import { Ionicons, FontAwesome, Fontisto } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { View } from '@/components/Themed';
 
@@ -22,6 +22,13 @@ function IITabBarIcon(props: {
   return <Ionicons size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
+function FontistoIcon(props: {
+  name: React.ComponentProps<typeof Fontisto>['name'];
+  color: string;
+}) {
+  return <Fontisto size={23} style={{ marginBottom: -3 }} {...props} />;
+}
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
@@ -38,6 +45,13 @@ export default function TabLayout() {
         options={{
           title: 'Journal',
           tabBarIcon: ({ color }) => <FATabBarIcon name="book" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="four"
+        options={{
+          title: 'History',
+          tabBarIcon: ({ color }) => <FontistoIcon name="nav-icon-grid-a" color={color} />,
         }}
       />
       <Tabs.Screen

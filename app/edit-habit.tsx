@@ -1,4 +1,4 @@
-import { StyleSheet, FlatList, TextInput, KeyboardAvoidingView, TouchableOpacity, Pressable } from 'react-native';
+import { StyleSheet, FlatList, TextInput, KeyboardAvoidingView, TouchableOpacity, Pressable, Modal } from 'react-native';
 import { useRouter } from "expo-router";
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import { useEffect, useState } from 'react';
@@ -23,10 +23,10 @@ interface habitData {
 }
 
 const todayDateObj = new Date();
-const todayYear = todayDateObj.getFullYear();
-const todayMonth = String(todayDateObj.getMonth() + 1).padStart(2, '0');
-const todayDay = String(todayDateObj.getDate()).padStart(2, '0');
-const today = `${todayYear}-${todayMonth}-${todayDay}`;
+// const todayYear = todayDateObj.getFullYear();
+// const todayMonth = String(todayDateObj.getMonth() + 1).padStart(2, '0');
+// const todayDay = String(todayDateObj.getDate()).padStart(2, '0');
+// const today = `${todayYear}-${todayMonth}-${todayDay}`;
 
 const dayIndex = todayDateObj.getDay();
 
@@ -44,12 +44,13 @@ export default function EditHabit() {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [habitName, setHabitName] = useState<string | undefined>();
     const [startDate, setStartDate] = useState<Date>(new Date());
-    const [skipDays, setSkipDays] = useState<boolean[]>(new Array(7).fill(true));
+    const [frequency, setFrequency] = useState<boolean[]>(new Array(7).fill(true));
     const selectedColor = useSharedValue(originalHabitData?.color);
     const backgroundColorStyle = useAnimatedStyle(() => ({ backgroundColor: selectedColor.value }));
     const [intention, setIntention] = useState<string>();
     const [selectedRoutine, setSelectedRoutine] = useState<number>();
     const [routineList, setRoutineList] = useState<any[]>([]);
+    const [showModal, setShowModal] = useState<boolean>(false);
 
     useEffect(() => {
         const queryFormData = async () => {
@@ -63,7 +64,7 @@ export default function EditHabit() {
                 const habitData: any = await db.getFirstAsync('SELECT habits.title, habits.start_date, habits.color, habits.intention, habits.routine_id FROM habits WHERE habits.id = ?', params.id);
 
 
-                const frequency: any[] = await db.getAllAsync(`
+                const frequencyList: any[] = await db.getAllAsync(`
                     SELECT days.day_number 
                     FROM days
                     JOIN habits_days_frequency
@@ -71,9 +72,9 @@ export default function EditHabit() {
                     WHERE habits_days_frequency.habit_id = ?
                     `, params.id);
 
-                if (frequency) {
-                    const frequencyArray = new Array(7).fill(false);
-                    frequency.forEach(data => {
+                if (frequencyList) {
+                    const frequencyArray = new Array(7);
+                    frequencyList.forEach(data => {
                         frequencyArray[data.day_number] = true;
                     });
                     habitData.frequency = frequencyArray;
@@ -83,7 +84,7 @@ export default function EditHabit() {
 
                 setHabitName(habitData.title);
                 setStartDate(new Date(habitData?.start_date + fullOffset));
-                setSkipDays(habitData.frequency);
+                setFrequency(habitData.frequency);
                 setIntention(habitData.intention ? habitData.intention : '');
                 setSelectedRoutine(habitData.routine_id);
                 selectedColor.value = habitData.color;
@@ -105,6 +106,15 @@ export default function EditHabit() {
 
         // console.log(habitName, startDate, skipDays, selectedColor.value, 'intention: ', intention, selectedRoutine)
         // console.log(originalHabitData);
+        const todayDateObj = new Date();
+        const todayYear = todayDateObj.getFullYear();
+        const todayMonth = String(todayDateObj.getMonth() + 1).padStart(2, '0');
+        const todayDay = String(todayDateObj.getDate()).padStart(2, '0');
+        const today = `${todayYear}-${todayMonth}-${todayDay}`;
+
+        const todayIdQuery: any = await db.getFirstAsync(`SELECT id FROM entry_date_storage WHERE date = ?`, today);
+        const todayId: number = todayIdQuery.id;
+
 
         // update habit name
         if (habitName != originalHabitData?.title) {
@@ -143,62 +153,62 @@ export default function EditHabit() {
         //          false in new: delete entry in habits_days_frequency
         //          true in new: add entry in habits_days_frequency
         // update habit_entries row:
-        for (let i = 0; i < skipDays.length; i++) {
-            if (skipDays[i] != originalHabitData?.frequency[i]) {
-                console.log('update habit frequency (i + 1 = day_id)', i, skipDays[i]);
+        for (let i = 0; i < frequency.length; i++) {
+            if (frequency[i] != originalHabitData?.frequency[i]) {
+                console.log('update habit frequency (i + 1 = day_id)', i, frequency[i]);
 
-                if (skipDays[i]) {
+                if (frequency[i]) {
                     await db.runAsync(`INSERT INTO habits_days_frequency (habit_id, day_id) VALUES (?, ?)`, params.id, i + 1);
                 } else {
                     await db.runAsync(`DELETE FROM habits_days_frequency WHERE habit_id = ? AND day_id = ?`, params.id, i + 1);
                 }
+
                 // did today's frequency day change?
-                if (dayIndex === i) {
-                    // true
-                    console.log('update today\'s entry');
-                    //where entry date = today, and habit_id = params.id
-                    // is today a habit day?
-                    if (skipDays[i]) {
-                        // true: is a day: set status to 0
-                        console.log('change entry status to 0 and increment total days'); // previous was a skip, but today is a day so set to 0, increment today days
-
-                        await db.runAsync(`UPDATE habit_entries SET status = 0, total_days = total_days + 1 WHERE habit_id = ? AND DATE(entry_date) = ?`, params.id, today);
-                        // if there is a routine_id, update that routine entry
-                    } else {
-                        // false
-                        console.log('changed entry status to 1 but keep streak, and hit total');
-                        console.log('if prev status was 0 decrement total days, if it was 2 do nothing'); // To not remove the hit if the person already did the habit today but wants to change the frequency anyway
-                        // or if they missed it but want to change the frequency, to not penalize their streak
-                        // if there is a routine_id, update that routine entry
-                        const entryStatus: any = await db.getFirstAsync(`SELECT status, total_days FROM habit_entries WHERE habit_id = ? and DATE(entry_date) = ?`, params.id, today);
-
-                        console.log(entryStatus);
-
-                        await db.runAsync(`UPDATE habit_entries SET total_days = ?, status = 1 WHERE habit_id = ? AND DATE(entry_date) = ?`, entryStatus.status === 0 ? entryStatus.total_days - 1 : entryStatus.total_days, params.id, today);
-                    }
-
-                    // Habit Entry was changed, change its routine if it exists
-                    if (originalHabitData?.routine_id) {
-                        const totalHabits: any = await db.getFirstAsync(`SELECT COUNT(*) FROM habits WHERE routine_id = ?`, originalHabitData?.routine_id);
-                        const habitsComplete: any = await db.getFirstAsync(`SELECT COUNT(*) FROM habit_entries 
-                                                    JOIN habits 
-                                                    ON habits.id = habit_entries.habit_id 
-                                                    WHERE routine_id = ?
-                                                    AND habit_entries.status > 0 
-                                                    AND DATE(entry_date) = ?`, originalHabitData?.routine_id, today);
-
-                        await db.runAsync(`
-                        UPDATE routine_entries 
-                        SET total_habits = ?,
-                        habits_complete = ? 
-                        WHERE routine_id = ?
-                        AND
-                        DATE(entry_date) = ?;
-                        `, totalHabits['COUNT(*)'], habitsComplete['COUNT(*)'], originalHabitData?.routine_id, today);
-                    }
-
-                }
-                // false: don't update the entry    
+                // NOTE: Frontend state was not updating even though the database updates correctly. This is a forbidden action for now
+                // if (dayIndex === i) {
+                //     // true
+                //     console.log('update today\'s entry');
+                //     //where entry date = today, and habit_id = params.id
+                //     // is today a habit day?
+                //     // {"current_streak": 2, "entry_date_id": "2024-03-28", "habit_id": 10, "hit_total": 1, "id": 30, "status": 2, "title": "Testing freq fix", "total_days": 2}
+                //     if (frequency[i]) {
+                //         // true: is a day: set status to 0
+                //         console.log('change entry status to 0 and increment total days'); // previous was a skip, but today is a day so set to 0, increment today days
+                //         // that means, today WAS a skip day
+                //         // total_days, hit_total, and current streak were left alone
+                //         // iterate total_days
+                //         await db.runAsync(`UPDATE habit_entries SET status = 0, total_days = total_days + 1 WHERE habit_id = ? AND DATE(entry_date_id) = ?`, params.id, today);
+                //         // if there is a routine_id, update that routine entry
+                //     } else {
+                //         // false
+                //         console.log('changed entry status to 1');
+                //         console.log('if prev status was 2 decrement hit_total and total_days'); // To not remove the hit if the person already did the habit today but wants to change the frequency anyway
+                //         // or if they missed it but want to change the frequency, to not penalize their streak
+                //         // if there is a routine_id, update that routine entry
+                //         const entryStatus: any = await db.getFirstAsync(`SELECT status, total_days, hit_total, current_streak FROM habit_entries WHERE habit_id = ? and DATE(entry_date_id) = ?`, params.id, today);
+                //         console.log('entryStatus', entryStatus);
+                //         console.log(entryStatus.status == 2, entryStatus.status === 2, entryStatus.status)
+                //         await db.runAsync(`UPDATE habit_entries SET total_days = ?, hit_total = ?, current_streak = ?, status = 1 WHERE habit_id = ? AND DATE(entry_date_id) = ?`, entryStatus.total_days - 1, entryStatus.status == 2 ? entryStatus.hit_total - 1 : entryStatus.hit_total, entryStatus.status == 2 ? entryStatus.current_streak - 1 : entryStatus.current_streak, params.id, today);
+                //     }
+                //     // Habit Entry was changed, change its routine if it exists
+                //     if (originalHabitData?.routine_id) {
+                //         const totalHabits: any = await db.getFirstAsync(`SELECT COUNT(*) FROM habits WHERE routine_id = ?`, originalHabitData?.routine_id);
+                //         const habitsComplete: any = await db.getFirstAsync(`SELECT COUNT(*) FROM habit_entries
+                //                                     JOIN habits
+                //                                     ON habits.id = habit_entries.habit_id
+                //                                     WHERE routine_id = ?
+                //                                     AND habit_entries.status > 0
+                //                                     AND DATE(entry_date_id) = ?`, originalHabitData?.routine_id, today);
+                //         await db.runAsync(`
+                //         UPDATE routine_entries 
+                //         SET total_habits = ?,
+                //         habits_complete = ? 
+                //         WHERE routine_id = ?
+                //         AND
+                //         DATE(entry_date_id) = ?;
+                //         `, totalHabits['COUNT(*)'], habitsComplete['COUNT(*)'], originalHabitData?.routine_id, today);
+                //     }
+                // }
             }
         }
 
@@ -219,11 +229,11 @@ export default function EditHabit() {
                                                         ON habits.id = habit_entries.habit_id 
                                                         WHERE routine_id = ?
                                                         AND habit_entries.status > 0 
-                                                        AND DATE(entry_date) = ?`, selectedRoutine, today);
+                                                        AND entry_date_id = ?`, selectedRoutine, todayId);
                 if (totalHabits['COUNT(*)'] === 1) {
                     // this routine now has entries, initialize its entry
-                    await db.runAsync(`INSERT INTO routine_entries (routine_id, habits_complete, total_habits) 
-                    SELECT ?, ?, 1`, selectedRoutine, habitsComplete['COUNT(*)']);
+                    await db.runAsync(`INSERT INTO routine_entries (routine_id, habits_complete, total_habits, entry_date_id) 
+                    SELECT ?, ?, 1, ?`, selectedRoutine, habitsComplete['COUNT(*)'], todayId);
                 } else {
                     await db.runAsync(`
                                 UPDATE routine_entries 
@@ -231,8 +241,8 @@ export default function EditHabit() {
                                 habits_complete = ? 
                                 WHERE routine_id = ?
                                 AND
-                                DATE(entry_date) = ?;
-                                `, totalHabits['COUNT(*)'], habitsComplete['COUNT(*)'], selectedRoutine, today);
+                                entry_date_id = ?;
+                                `, totalHabits['COUNT(*)'], habitsComplete['COUNT(*)'], selectedRoutine, todayId);
                 }
             } else {
                 // new routine is null
@@ -251,9 +261,9 @@ export default function EditHabit() {
                                                     ON habits.id = habit_entries.habit_id 
                                                     WHERE routine_id = ?
                                                     AND habit_entries.status > 0 
-                                                    AND DATE(entry_date) = ?`, originalHabitData?.routine_id, today);
+                                                    AND entry_date_id = ?`, originalHabitData?.routine_id, todayId);
                 if (oldTotalHabits['COUNT(*)'] === 0) {
-                    await db.runAsync(`DELETE FROM routine_entries WHERE routine_id = ? AND DATE(entry_date) = ?`, originalHabitData.routine_id, today)
+                    await db.runAsync(`DELETE FROM routine_entries WHERE routine_id = ? AND entry_date_id = ?`, originalHabitData.routine_id, todayId)
                 } else {
                     await db.runAsync(`
                         UPDATE routine_entries 
@@ -261,19 +271,17 @@ export default function EditHabit() {
                         habits_complete = ? 
                         WHERE routine_id = ?
                         AND
-                        DATE(entry_date) = ?;
-                        `, oldTotalHabits['COUNT(*)'], oldHabitsComplete['COUNT(*)'], originalHabitData?.routine_id, today);
+                        entry_date_id = ?;
+                        `, oldTotalHabits['COUNT(*)'], oldHabitsComplete['COUNT(*)'], originalHabitData?.routine_id, todayId);
                 }
             }
         }
 
-        console.log('habit update complete');
+        // console.log('habit update complete');
         // reroute to home, and refetch
-        router.replace(
-            {
-                pathname: '/(tabs)/'
-            }
-        )
+        router.navigate({
+            pathname: "/(tabs)/"
+        })
     }
 
     const params: any = useLocalSearchParams(); // see habitParams, will not accept it as a type 
@@ -314,7 +322,7 @@ export default function EditHabit() {
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                 <Text style={styles.formTitle}>Frequency:</Text>
                             </View>
-                            <FrequencyPicker frequency={skipDays} setFrequency={setSkipDays} color={originalHabitData?.color} tab={'edit'} />
+                            <FrequencyPicker frequency={frequency} setFrequency={setFrequency} color={originalHabitData?.color} tab={'edit'} forbiddenIndex={dayIndex} setShowModal={setShowModal} />
                         </View>
                         <View style={styles.divider} />
                         {/* HABIT COLOR INPUT */}
@@ -359,6 +367,23 @@ export default function EditHabit() {
                             activeOpacity={0.85}>
                             <Text>Save Changes</Text>
                         </TouchableOpacity>
+                        <Modal animationType='fade'
+                            transparent={true}
+                            visible={showModal}
+                            onRequestClose={() => {
+                                setShowModal(!showModal);
+                            }}>
+                            <View style={styles.modalContainer}>
+                                <View style={styles.modalView}>
+                                    <Text style={[styles.modalText]}>Cannot Change Current Day's Frequency</Text>
+                                    <Pressable
+                                        style={[styles.button, styles.buttonCancel]}
+                                        onPress={() => setShowModal(false)}>
+                                        <Text style={styles.textStyle}>Close</Text>
+                                    </Pressable>
+                                </View>
+                            </View>
+                        </Modal>
                     </ScrollView>}
             </KeyboardAvoidingView>
         </GestureHandlerRootView >
@@ -411,5 +436,48 @@ const styles = StyleSheet.create({
         borderColor: 'gray',
         height: 40,
         alignSelf: 'center'
-    }
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#000000b9',
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'transparent',
+        padding: 35,
+        alignItems: 'center',
+        width: '50%',
+        height: '25%',
+        justifyContent: 'center',
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    button: {
+        borderRadius: 10,
+        padding: 10,
+        elevation: 2,
+        margin: 10,
+        width: '100%'
+    },
+    buttonDelete: {
+        backgroundColor: 'red',
+    },
+    buttonCancel: {
+        backgroundColor: '#2196F3',
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    modalText: {
+        marginBottom: -5,
+        textAlign: 'center',
+        color: 'white',
+        fontWeight: 'bold',
+        flex: 1
+    },
 });

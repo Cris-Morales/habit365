@@ -6,11 +6,12 @@ interface props {
     statsUpdate: (checked: boolean) => void;
     habitColor: string;
     status: number;
+    journalPage: number;
 }
 
 
 
-export default function HabitButton({ statsUpdate, habitColor, status }: props) {
+export default function HabitButton({ statsUpdate, habitColor, status, journalPage }: props) {
 
     const [pressed, setPressed] = useState<boolean>(status >= 1 ? true : false);
     const springAnimation = useRef(new Animated.Value(status === 2 ? 1.2 : 1)).current;
@@ -83,7 +84,7 @@ export default function HabitButton({ statsUpdate, habitColor, status }: props) 
         <Pressable
             onPressIn={handlePressed}
             style={styles.container}
-            disabled={status === 1 ? true : false}>
+            disabled={status === 1 || journalPage != 0 ? true : false}>
             <Animated.View
                 style={[
                     styles.checkbox,

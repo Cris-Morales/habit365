@@ -33,12 +33,14 @@ export default function HabitDetails() {
   const db = useSQLiteContext();
 
   useEffect(() => {
-    console.log('useEffect')
     const queryData = async () => {
       try {
         // !isLoading && setIsLoading(true);
+        const todayIdQuery: any = await db.getFirstAsync(`SELECT id FROM entry_date_storage WHERE date = ?`, today);
+        const todayId: number = todayIdQuery.id;
+
         const habitData: any = await db.getFirstAsync(`
-                SELECT habits.color, habits.created_at, habits.id, habits.intention, habits.longest_streak, habits.routine_id, habits.start_date, habits.title, habit_entries.current_streak, habit_entries.total_days, habit_entries.hit_total, routines.title AS routine_title
+                SELECT habits.color, habits.created_at, habits.id, habits.intention, habits.longest_streak, habits.routine_id, habits.start_date, habits.title, habit_entries.current_streak, habit_entries.total_days, habit_entries.hit_total, habit_entries.new_streak_pr, routines.title AS routine_title
                 FROM habits 
                 LEFT JOIN routines 
                 ON habits.routine_id = routines.id 
@@ -46,7 +48,7 @@ export default function HabitDetails() {
                 ON habits.id = habit_entries.habit_id
                 WHERE habits.id = ?
                 AND
-                habit_entries.entry_date = ?`, params.id, today);
+                habit_entries.entry_date_id = ?`, params.id, todayId);
 
         const frequency: frequency[] = await db.getAllAsync(`
                 SELECT days.day_number 
@@ -121,17 +123,13 @@ export default function HabitDetails() {
             <Text style={styles.subTitle}>
               Longest Streak:
               <Text style={{ fontWeight: 'bold', color: habitDetails?.color }}>
-                {habitDetails?.longest_streak}
+                {habitDetails?.new_streak_pr ? habitDetails?.current_streak : habitDetails?.longest_streak}
               </Text>
             </Text>
           </View>
           <View style={styles.statContainer}>
             <Text style={[styles.subTitle, { fontWeight: 'bold' }]}>Frequency: </Text>
             <FrequencyPicker frequency={habitDetails.frequency} setFrequency={null} isEnabled={false} tab={'details'} color={habitDetails.color} />
-          </View>
-          <View style={styles.separator} lightColor="#eee" darkColor="gray" />
-          <View style={styles.statContainer}>
-            <Text style={[styles.subTitle, { fontStyle: 'italic' }]}>Calender Coming Soon!</Text>
           </View>
           <View style={styles.separator} lightColor="#eee" darkColor="gray" />
           <View style={styles.statContainer}>

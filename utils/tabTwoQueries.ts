@@ -21,7 +21,10 @@ const dayIndex = todayDateObj.getDay();
 const tabTwoQueries: any = {
     insertHabit: async (db: SQLite.SQLiteDatabase, title: string, start_date: string, color: string, intention: string, routine_id: number | null, frequency: boolean[]) => {
         try {
+            const todayIdQuery: any = await db.getFirstAsync(`SELECT id FROM entry_date_storage WHERE date = ?`, today);
+            const todayId: number = todayIdQuery.id;
             const results: any = await db.runAsync('INSERT INTO habits (title, start_date, color, intention) VALUES (?, ?, ?, ?)', title, start_date, color, intention);
+
 
             for (let i = 1; i <= frequency.length; i++) {
                 if (frequency[i - 1]) {
@@ -31,25 +34,25 @@ const tabTwoQueries: any = {
             }
 
             // insert journal entry
-            await db.runAsync('INSERT INTO habit_entries (habit_id, status, current_streak, hit_total, total_days, entry_date) VALUES (?, ?, ?, ?, ?, ?)', results.lastInsertRowId, frequency[dayIndex] ? 0 : 1, 0, 0, frequency[dayIndex] ? 1 : 0, today);
+            await db.runAsync('INSERT INTO habit_entries (habit_id, status, current_streak, hit_total, total_days, entry_date_id) VALUES (?, ?, ?, ?, ?, ?)', results.lastInsertRowId, frequency[dayIndex] ? 0 : 1, 0, 0, frequency[dayIndex] ? 1 : 0, todayId);
 
             // console.log('Habit Inserted, checking routine_id...');
             if (routine_id) {
                 await db.runAsync('UPDATE habits SET routine_id = ? WHERE id = ?;', routine_id, results.lastInsertRowId);
 
-                const routineEntry: any[] | any = await db.getFirstAsync(`SELECT id, habits_complete, total_habits FROM routine_entries WHERE routine_id = ? AND entry_date = ?`, routine_id, today);
+                const routineEntry: any[] | any = await db.getFirstAsync(`SELECT id, habits_complete, total_habits FROM routine_entries WHERE routine_id = ? AND entry_date_id = ?`, routine_id, todayId);
                 // console.log('Updating routine entry routine_id: ', routineEntry);
 
                 if (routineEntry) {
                     // add to its totals, frequency determines if habit is skipped and added to complete total or not which means complete total is the same
-                    await db.runAsync(`UPDATE routine_entries SET total_habits = ?, habits_complete = ? WHERE id = ? AND entry_date = ?`, routineEntry.total_habits + 1, routineEntry.habits_complete + !frequency[dayIndex] && 1, routineEntry.id, today);
+                    await db.runAsync(`UPDATE routine_entries SET total_habits = ?, habits_complete = ? WHERE id = ? AND entry_date_id = ?`, routineEntry.total_habits + 1, routineEntry.habits_complete + !frequency[dayIndex] && 1, routineEntry.id, todayId);
                 } else {
                     // means this is this routine's first habit or routine has a singular habit
                     await db.runAsync(`
-                    INSERT INTO routine_entries (routine_id, entry_date, habits_complete, total_habits) 
+                    INSERT INTO routine_entries (routine_id, entry_date_id, habits_complete, total_habits) 
                     SELECT ?, ?, 
                     ?,
-                    1`, routine_id, today, frequency[dayIndex] ? 0 : 1);
+                    1`, routine_id, todayId, frequency[dayIndex] ? 0 : 1);
                 }
             }
 
@@ -99,7 +102,9 @@ const tabTwoQueries: any = {
     insertEntry: async (db: SQLite.SQLiteDatabase, action: string, id: number, frequency: boolean[]) => {
         try {
             if (action == 'habit') {
-                await db.runAsync('INSERT INTO habit_entries (habit_id, status, current_streak, hit_total, total_days, entry_date) VALUES (?, ?, ?, ?, ?, ?)', id, frequency[dayIndex] ? 0 : 1, 0, 0, frequency[dayIndex] ? 1 : 0, today);
+                const todayIdQuery: any = await db.getFirstAsync(`SELECT id FROM entry_date_storage WHERE date = ?`, today);
+                const todayId: number = todayIdQuery.id;
+                await db.runAsync('INSERT INTO habit_entries (habit_id, status, current_streak, hit_total, total_days, entry_date_id) VALUES (?, ?, ?, ?, ?, ?)', id, frequency[dayIndex] ? 0 : 1, 0, 0, frequency[dayIndex] ? 1 : 0, todayId);
             } else {
 
             }
